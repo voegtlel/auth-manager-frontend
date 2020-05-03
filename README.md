@@ -3,7 +3,7 @@
 </a>
 <img src="https://img.shields.io/github/license/voegtlel/auth-manager-frontend.svg" alt="License" />
 
-# Client for ldap admin
+# Client for user authentication and management
 
 This is the frontend for [auth-manager-backend](https://github.com/voegtlel/auth-manager-backend).
 
@@ -84,3 +84,7 @@ services:
 networks:
   backend:
 ```
+
+# License
+
+MIT
