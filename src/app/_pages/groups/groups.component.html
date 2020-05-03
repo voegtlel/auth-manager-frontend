@@ -1,0 +1,11 @@
+<nb-card [nbSpinner]="!groupsData">
+  <nb-card-header>
+    <span>Groups</span>
+    <nb-actions>
+      <nb-action icon="plus" [routerLink]="['/groups', 'new']">Add</nb-action>
+    </nb-actions>
+  </nb-card-header>
+  <nb-card-body>
+    <app-table [columns]="columns" [data]="groupsData"></app-table>
+  </nb-card-body>
+</nb-card>

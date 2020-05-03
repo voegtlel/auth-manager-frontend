@@ -1,0 +1,13 @@
+@import "../../../../themes";
+
+.spacing {
+  padding: 1em 0 1em 0;
+  hr {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0;
+    border: nb-theme(card-divider-width) nb-theme(card-divider-style)
+      nb-theme(card-divider-color);
+  }
+}

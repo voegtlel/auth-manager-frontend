@@ -1,0 +1,210 @@
+<nb-card>
+  <nb-card-header>
+    <ng-container>
+      Client
+    </ng-container>
+  </nb-card-header>
+  <nb-card-body [nbSpinner]="loading || saving">
+    <form (submit)="submit($event)" [formGroup]="form">
+      <div class="form-control-group">
+        <label class="label" [for]="client_id_el">Client ID</label>
+        <input
+          type="text"
+          nbInput
+          fullWidth
+          placeholder="Client ID"
+          formControlName="id"
+          [status]="form.get('id').valid ? 'basic' : 'danger'"
+          #client_id_el
+        />
+        <div *ngIf="form.get('id').hasError('required')" class="error-message">
+          Required.
+        </div>
+        <div *ngIf="form.get('id').hasError('pattern')" class="error-message">
+          Contains invalid characters, allowed characters: 'a'-'z', 'A'-'Z',
+          '0'-'9', '_', '.', '+', '-'.
+        </div>
+        <div
+          *ngIf="form.get('id').hasError('clientExists')"
+          class="error-message"
+        >
+          A client with this ID already exists.
+        </div>
+      </div>
+
+      <div class="form-control-group">
+        <label class="label" [for]="group_notes_el">Notes</label>
+        <textarea
+          type="text"
+          nbInput
+          fullWidth
+          placeholder="Notes"
+          formControlName="notes"
+          [status]="form.get('notes').valid ? 'basic' : 'danger'"
+          #group_notes_el
+        ></textarea>
+        <div
+          *ngIf="form.get('notes').hasError('required')"
+          class="error-message"
+        >
+          Required.
+        </div>
+      </div>
+
+      <div class="form-control-group">
+        <label class="label" [for]="allowed_scopes_el">Allowed Scopes</label>
+        <nb-select
+          multiple
+          fullWidth
+          placeholder="Allowed Scopes"
+          formControlName="allowed_scope"
+          #allowed_scopes_el
+        >
+          <nb-option
+            *ngFor="let scope of availableScopes$ | async"
+            [value]="scope"
+            >{{ scope }}</nb-option
+          >
+        </nb-select>
+        <div
+          *ngIf="form.get('notes').hasError('required')"
+          class="error-message"
+        >
+          Required.
+        </div>
+      </div>
+
+      <div class="form-control-group">
+        <label class="label" [for]="client_secret_el">Client Secret</label>
+        <nb-form-field>
+          <button
+            *ngIf="canGeneratePassword"
+            nbSuffix
+            nbButton
+            ghost
+            type="button"
+            (click)="generatePassword()"
+          >
+            <nb-icon icon="sync"></nb-icon>
+          </button>
+          <input
+            type="text"
+            nbInput
+            fullWidth
+            placeholder="Client Secret"
+            formControlName="client_secret"
+            [status]="form.get('client_secret').valid ? 'basic' : 'danger'"
+            #client_secret_el
+          />
+        </nb-form-field>
+        <div
+          *ngIf="form.get('client_secret').hasError('required')"
+          class="error-message"
+        >
+          Required.
+        </div>
+      </div>
+
+      <div class="form-control-group">
+        <label class="label" [for]="token_endpoint_auth_method_el"
+          >Token Endpoint Auth Methods</label
+        >
+        <nb-select
+          multiple
+          fullWidth
+          placeholder="Token Endpoint Auth Method"
+          formControlName="token_endpoint_auth_method"
+          [status]="
+            form.get('token_endpoint_auth_method').valid ? 'basic' : 'danger'
+          "
+          #token_endpoint_auth_method_el
+        >
+          <nb-option value="client_secret_basic">Client Secret Basic</nb-option>
+          <nb-option value="client_secret_post">Client Secret Post</nb-option>
+          <nb-option value="client_secret_jwt" disabled
+            >Client Secret JWT</nb-option
+          >
+          <nb-option value="private_key_jwt" disabled
+            >Private Key JWT</nb-option
+          >
+          <nb-option value="none">None</nb-option>
+        </nb-select>
+        <div
+          *ngIf="form.get('token_endpoint_auth_method').hasError('required')"
+          class="error-message"
+        >
+          Required.
+        </div>
+      </div>
+
+      <div class="form-control-group">
+        <label class="label" [for]="response_type_el">Response Types</label>
+        <nb-select
+          multiple
+          fullWidth
+          placeholder="Response Types"
+          formControlName="response_type"
+          [status]="form.get('response_type').valid ? 'basic' : 'danger'"
+          #response_type_el
+        >
+          <nb-option value="code">Code</nb-option>
+          <nb-option value="token">Token</nb-option>
+          <nb-option value="id_token">ID Token</nb-option>
+          <nb-option value="code token">Code + Token</nb-option>
+          <nb-option value="code id_token">Code + Id Token</nb-option>
+          <nb-option value="token id_token">Token + Id Token</nb-option>
+          <nb-option value="code token id_token"
+            >Code + Token + Id Token</nb-option
+          >
+        </nb-select>
+        <div
+          *ngIf="form.get('response_type').hasError('required')"
+          class="error-message"
+        >
+          Required.
+        </div>
+      </div>
+
+      <div class="form-control-group">
+        <label class="label" [for]="grant_type_el">Grant Types</label>
+        <nb-select
+          multiple
+          fullWidth
+          placeholder="Grant Types"
+          formControlName="grant_type"
+          [status]="form.get('grant_type').valid ? 'basic' : 'danger'"
+          #grant_type_el
+        >
+          <nb-option value="authorization_code">Authorization Code</nb-option>
+          <nb-option value="implicit">Implicit</nb-option>
+          <nb-option value="refresh_token">Refresh Token</nb-option>
+        </nb-select>
+        <div
+          *ngIf="form.get('grant_type').hasError('required')"
+          class="error-message"
+        >
+          Required.
+        </div>
+        <div
+          *ngIf="form.get('grant_type').hasError('missingTypes')"
+          class="error-message"
+        >
+          Response Types require
+          {{ form.get("grant_type").getError("missingTypes").requiredTypes }}.
+        </div>
+      </div>
+
+      <app-member-groups-access
+        formControlName="access_groups"
+      ></app-member-groups-access>
+
+      <button nbButton type="submit" [disabled]="!form.valid || form.pristine">
+        <ng-container *ngIf="isNew">Create Client</ng-container>
+        <ng-container *ngIf="!isNew">Save Client</ng-container>
+      </button>
+      <div *ngIf="lastError" class="error-message">
+        {{ lastError }}
+      </div>
+    </form>
+  </nb-card-body>
+</nb-card>

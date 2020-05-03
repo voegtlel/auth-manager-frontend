@@ -1,0 +1,101 @@
+<div [nbSpinner]="pictureSaving">
+  <div class="picture-preview round" [class.editable]="canEdit">
+    <img *ngIf="pictureUrl" [src]="pictureUrl" />
+    <span *ngIf="!pictureUrl">{{ initials }}</span>
+    <div
+      class="overlay"
+      (click)="openSelectDialog(setProfileDialog)"
+      *ngIf="canEdit"
+    >
+      <nb-icon icon="camera"></nb-icon>
+      <span>Change Profile Picture</span>
+    </div>
+  </div>
+
+  <div class="picture-preview rectangle">
+    <img *ngIf="pictureUrl" [src]="pictureUrl" />
+    <span *ngIf="!pictureUrl">{{ initials }}</span>
+    <div
+      class="overlay"
+      (click)="openSelectDialog(setProfileDialog)"
+      *ngIf="canEdit"
+    >
+      <nb-icon icon="camera"></nb-icon>
+      <span>Change Profile Picture</span>
+    </div>
+  </div>
+
+  <div *ngIf="lastError" class="error-message">
+    {{ lastError }}
+  </div>
+</div>
+
+<ng-template #setProfileDialog>
+  <ngx-file-drop
+    [multiple]="false"
+    [directory]="false"
+    (onFileDrop)="pictureDropped($event)"
+    dropZoneClassName="drop-zone"
+    [contentClassName]="
+      pictureDroppedFile ? 'drop-content-invisible' : 'drop-content'
+    "
+    (click)="clickDrop($event)"
+  >
+    <ng-template
+      ngx-file-drop-content-tmp
+      let-openFileSelector="openFileSelector"
+    >
+      <nb-card
+        *ngIf="pictureDroppedFile"
+        class="fill-card"
+        [nbSpinner]="pictureLoading || pictureSaving"
+      >
+        <nb-card-body class="center-body">
+          <image-cropper
+            *ngIf="!pictureLoadFailure"
+            [imageFile]="pictureDroppedFile"
+            [maintainAspectRatio]="true"
+            [aspectRatio]="1 / 1"
+            format="jpeg"
+            [roundCropper]="true"
+            [imageQuality]="85"
+            [resizeToWidth]="2048"
+            [cropperMinWidth]="128"
+            [onlyScaleDown]="true"
+            [autoCrop]="false"
+            (loadImageFailed)="pictureImageFailed()"
+            (imageLoaded)="pictureLoaded()"
+          ></image-cropper>
+          <nb-alert status="danger" *ngIf="pictureLoadFailure">
+            Could not load image!
+          </nb-alert>
+        </nb-card-body>
+        <nb-card-footer>
+          <button
+            nbButton
+            type="button"
+            (click)="pictureSave()"
+            [disabled]="pictureLoading"
+            [nbSpinner]="pictureSaving"
+          >
+            Save Picture
+          </button>
+          <button nbButton type="button" (click)="closeDialog()">
+            Cancel
+          </button>
+          <button nbButton type="button" (click)="openFileSelector()">
+            Open Other File
+          </button>
+        </nb-card-footer>
+      </nb-card>
+      <button
+        *ngIf="!pictureDroppedFile"
+        nbButton
+        type="button"
+        (click)="openFileSelector()"
+      >
+        Select File
+      </button>
+    </ng-template>
+  </ngx-file-drop>
+</ng-template>

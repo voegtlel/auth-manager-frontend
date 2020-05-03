@@ -1,0 +1,18 @@
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-header {
+  cursor: pointer;
+}
+
+.compact-column {
+  width: 7em;
+}
+
+.controls {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-between;
+}

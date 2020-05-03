@@ -1,0 +1,77 @@
+<div class="controls">
+  <nb-form-field>
+    <nb-icon nbPrefix icon="funnel"></nb-icon>
+    <input
+      *ngIf="showSearch"
+      nbInput
+      placeholder="Filter"
+      [nbFilterInput]="dataSource"
+      class="search-input"
+    />
+  </nb-form-field>
+</div>
+<table
+  *ngIf="dataSource"
+  [nbTreeGrid]="dataSource"
+  [nbSort]="dataSource"
+  (sort)="updateSort($event)"
+>
+  <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="allColumns"></tr>
+  <tr
+    nbTreeGridRow
+    [clickToToggle]="false"
+    *nbTreeGridRowDef="let row; columns: allColumns"
+  ></tr>
+
+  <ng-container
+    *ngFor="let column of columns; let index = index"
+    [nbTreeGridColumnDef]="column.key"
+  >
+    <th
+      [class.clickable-header]="column.key"
+      nbTreeGridHeaderCell
+      [nbSortHeader]="getSortDirection(column.key)"
+      [disabled]="!column.key"
+      [class.compact-column]="column.compact"
+      *nbTreeGridHeaderCellDef
+    >
+      {{ column.title }}
+    </th>
+    <td
+      nbTreeGridCell
+      *nbTreeGridCellDef="let row"
+      [routerLink]="row.data.routerLink"
+      [class.clickable-row]="!readOnly"
+      (click)="onClickItem(row, column, $event)"
+    >
+      <ng-container *ngIf="!column.templateRef">
+        <ng-container *ngIf="!column.action">{{
+          column.key ? row.data[column.key] : ""
+        }}</ng-container>
+        <button
+          *ngIf="column.action"
+          nbButton
+          type="button"
+          (click)="column.action(row)"
+          ghost
+        >
+          <nb-icon *ngIf="column.icon" [icon]="column.icon"></nb-icon
+          >{{ column.key ? row.data[column.key] : "" }}
+        </button>
+      </ng-container>
+      <ng-container *ngIf="column.templateRef">
+        <ng-container
+          *ngTemplateOutlet="
+            column.templateRef;
+            context: {
+              row: row,
+              column: column,
+              $implicit: row.data[column.key]
+            }
+          "
+        >
+        </ng-container>
+      </ng-container>
+    </td>
+  </ng-container>
+</table>

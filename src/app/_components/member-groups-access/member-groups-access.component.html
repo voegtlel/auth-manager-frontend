@@ -1,0 +1,42 @@
+<nb-card [nbSpinner]="loading">
+  <nb-card-header>
+    <span>Groups / Roles</span>
+    <nb-actions>
+      <nb-action icon="plus" (click)="onAddGroupDialog(addGroupDialog)"
+        >Add</nb-action
+      >
+    </nb-actions>
+  </nb-card-header>
+  <nb-card-body>
+    <app-table
+      [columns]="columnsEdit"
+      [data]="accessGroupsData$ | async"
+    ></app-table>
+  </nb-card-body>
+</nb-card>
+
+<ng-template #addGroupDialog let-ref="dialogRef">
+  <nb-card [nbSpinner]="!(allGroupsData$ | async)">
+    <nb-card-header>
+      <span>Add Group</span>
+    </nb-card-header>
+    <nb-card-body>
+      <app-table
+        [columns]="columnsView"
+        [data]="allGroupsData$ | async"
+        (clickItem)="ref.close(); addGroupClick($event.data)"
+      ></app-table>
+    </nb-card-body>
+  </nb-card>
+</ng-template>
+
+<ng-template #rolesSelect let-column="column" let-row="row">
+  <input
+    nbInput
+    type="text"
+    fullWidth
+    placeholder="Roles"
+    [(ngModel)]="row.data[column.key]"
+    (ngModelChange)="updateRoleInput(row, column, $event)"
+  />
+</ng-template>

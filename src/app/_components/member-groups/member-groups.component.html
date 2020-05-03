@@ -1,0 +1,31 @@
+<nb-card [nbSpinner]="loading">
+  <nb-card-header>
+    <span>Groups</span>
+    <nb-actions *ngIf="!readOnly">
+      <nb-action icon="plus" (click)="onAddGroupDialog(addGroupDialog)"
+        >Add</nb-action
+      >
+    </nb-actions>
+  </nb-card-header>
+  <nb-card-body>
+    <app-table
+      [columns]="readOnly ? columnsView : columnsEdit"
+      [data]="groupsData$ | async"
+    ></app-table>
+  </nb-card-body>
+</nb-card>
+
+<ng-template #addGroupDialog let-ref="dialogRef">
+  <nb-card [nbSpinner]="!(allGroupsData$ | async)">
+    <nb-card-header>
+      <span>Add Group</span>
+    </nb-card-header>
+    <nb-card-body>
+      <app-table
+        [columns]="columnsView"
+        [data]="allGroupsData$ | async"
+        (clickItem)="ref.close(); addGroupClick($event.data)"
+      ></app-table>
+    </nb-card-body>
+  </nb-card>
+</ng-template>

@@ -1,0 +1,11 @@
+<nb-card [nbSpinner]="!clientsData">
+  <nb-card-header>
+    <span>Clients</span>
+    <nb-actions>
+      <nb-action icon="plus" [routerLink]="['/clients', 'new']">Add</nb-action>
+    </nb-actions>
+  </nb-card-header>
+  <nb-card-body>
+    <app-table [columns]="columns" [data]="clientsData"></app-table>
+  </nb-card-body>
+</nb-card>

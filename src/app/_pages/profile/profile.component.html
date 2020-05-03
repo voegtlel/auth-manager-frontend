@@ -1,0 +1,35 @@
+<nb-card>
+  <nb-card-header>
+    <ng-container *ngIf="registrationToken">
+      Register
+    </ng-container>
+    <ng-container *ngIf="!registrationToken && isNew">
+      Create User
+    </ng-container>
+    <ng-container *ngIf="!registrationToken && !isNew">
+      Profile
+    </ng-container>
+  </nb-card-header>
+  <nb-card-body [nbSpinner]="loading || saving">
+    <form (submit)="submit($event)">
+      <ng-container *ngFor="let property of profileData?.properties">
+        <app-field-editor
+          [userId]="profileData.user_id"
+          [property]="property"
+          [registering]="!!registrationToken"
+          (valueChange)="onValueChange(property.key, $event)"
+          (validChange)="onValidChange(property.key, $event)"
+        ></app-field-editor>
+      </ng-container>
+      <button nbButton type="submit" [disabled]="!valid || !hasChange">
+        <ng-container *ngIf="isNew">Create User</ng-container>
+        <ng-container *ngIf="!isNew">Save Profile</ng-container>
+      </button>
+      <div *ngIf="lastError" class="error-message">
+        {{ lastError }}
+      </div>
+    </form>
+  </nb-card-body>
+</nb-card>
+
+<!--<pre>{{ profileData | json }}</pre>-->
