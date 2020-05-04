@@ -110,7 +110,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   onValidChange(key: string, value: any) {
     this.valids[key] = value;
     this.valid = Object.values(this.valids).every((x) => x);
-    console.log('Profile valid:', this.valid, this.valids);
+    // console.log('Profile valid:', this.valid, this.valids);
   }
 
   submit($event) {
