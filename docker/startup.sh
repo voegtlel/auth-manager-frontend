@@ -9,10 +9,8 @@ else
 fi
 
 echo "Setting API_HOST=$API_HOST"
-envsubst '$API_HOST' < /usr/share/nginx/html/env.js.template > /usr/share/nginx/html/client/env.js
 echo "Setting OICD_ISSUER=$OICD_ISSUER"
-envsubst '$OICD_ISSUER' < /usr/share/nginx/html/env.js.template > /usr/share/nginx/html/client/env.js
 echo "Setting OICD_CLIENT_ID=$OICD_CLIENT_ID"
-envsubst '$OICD_CLIENT_ID' < /usr/share/nginx/html/env.js.template > /usr/share/nginx/html/client/env.js
+envsubst '$API_HOST $OICD_ISSUER $OICD_CLIENT_ID' < /usr/share/nginx/html/env.js.template > /usr/share/nginx/html/authlib-usermanager-frontend/env.js
 
 nginx -g "daemon off;"

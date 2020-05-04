@@ -19,7 +19,7 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 The docker image is located at `voegtlel/auth-manager-frontend`.
 
-## Docker compose
+# Docker compose
 
 ```
 version: '3'
@@ -83,6 +83,16 @@ services:
 networks:
   backend:
 ```
+
+## Installing
+
+Run:
+
+```
+docker-compose exec backend python -m user_manager.install
+```
+
+to create the initial `admin` user and reset the database.
 
 # License
 
