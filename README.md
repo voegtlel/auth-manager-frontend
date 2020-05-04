@@ -45,16 +45,15 @@ services:
     image: voegtlel/auth-manager-backend
     restart: unless-stopped
     volumes:
-      -
+      - ./key.private:/app/key.private
     environment:
       # Override any config.yaml variable by typing API_CONFIG_<container>_<container...>_<variable>
       # where the names are automagically converted from camelCase to underscore_notation (ignoring casing).
 
-      # Set this if you use different origin
-      # API_CONFIG_ALLOW_ORIGINS: "['https://auth.example.com']"
-
       API_CONFIG_MONGO_URI: "mongodb://auth:<mongopw>@mongo/auth"
 
+      # Generate this by: `openssl genrsa -out key.private 4096`
+      API_CONFIG_OAUTH2_KEYS_0_KEY_FILE: '/app/key.private'
       API_CONFIG_OAUTH2_BASE_URL: 'https://auth.example.com'
       API_CONFIG_OAUTH2_ISSUER: 'auth.example.com'
       API_CONFIG_MANAGER_BACKEND_CORS_ORIGIN: 'https://auth.example.com'
@@ -63,7 +62,7 @@ services:
       API_CONFIG_MANAGER_SECRET_KEY: <generate a random string here>
       API_CONFIG_MANAGER_NAME: "My User Manager"
       API_CONFIG_MANAGER_OAUTH2_SERVER_METADATA_URL: "https://auth.example.com/.well-known/openid-configuration"
-      API_CONFIG_MANAGER_OAUTH2_SERVER_CLIENT_ID: "manager"
+      API_CONFIG_MANAGER_OAUTH2_CLIENT_ID: "manager"
 
       API_CONFIG_MANAGER_MAIL_HOST: "mailhost"
       API_CONFIG_MANAGER_MAIL_SENDER: "account@example.com"
