@@ -8,6 +8,7 @@ export interface UserProperty {
     | 'str'
     | 'multistr'
     | 'datetime'
+    | 'date'
     | 'bool'
     | 'enum'
     | 'picture'
@@ -18,7 +19,7 @@ export interface UserProperty {
   format_help: string;
   can_edit: 'everybody' | 'self' | 'admin' | 'nobody';
   can_read: 'everybody' | 'self' | 'admin' | 'nobody';
-  visible: boolean;
+  visible: 'everybody' | 'self' | 'admin' | 'nobody';
   title: string;
   values: EnumValue[];
   template: string;

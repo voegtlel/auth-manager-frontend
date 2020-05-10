@@ -13,6 +13,7 @@ export class SetPasswordComponent {
   newPassword = '';
   repeatPassword = '';
   @Input() userId: string;
+  @Input() isActive: boolean;
 
   lastErrorPassword: string;
   lastError: string;
@@ -75,6 +76,7 @@ export class SetPasswordComponent {
             this.saving = false;
             this.newPassword = '';
             this.oldPassword = '';
+            this.repeatPassword = '';
           },
           (err) => {
             this.saving = false;
@@ -95,6 +97,32 @@ export class SetPasswordComponent {
   }
 
   sendPasswordLink() {
-    // TODO
+    this.saving = true;
+    this.apiService
+      .requestResetUserPassword(this.userId)
+      .toPromise()
+      .then(
+        () => {
+          this.saving = false;
+          this.toastr.success(
+            'Sent password reset link to user.',
+            'Password Reset'
+          );
+        },
+        (err) => {
+          this.saving = false;
+          if (err?.status === 0) {
+            this.toastr.danger(err?.statusText, 'Error');
+            this.lastError = err?.statusText;
+          } else if (err?.error?.detail) {
+            this.toastr.danger(err?.error?.detail, 'Error');
+            this.lastError = err?.error?.detail.toString();
+          } else if (err?.error) {
+            this.toastr.danger(err?.error, 'Error');
+            this.lastError = err?.error.toString();
+          }
+          console.log(err);
+        }
+      );
   }
 }

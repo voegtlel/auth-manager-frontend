@@ -79,7 +79,14 @@ export class MemberGroupsComponent
       this.groupsService.groupsById$,
     ]).pipe(
       map(([userGroups, groupsById]) =>
-        userGroups.map((userGroup) => groupsById[userGroup])
+        userGroups.map(
+          (userGroup) =>
+            groupsById[userGroup] || {
+              id: userGroup,
+              group_name: userGroup,
+              visible: false,
+            }
+        )
       )
     );
     this.groupsData$ = userGroups$.pipe(

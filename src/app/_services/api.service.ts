@@ -13,10 +13,20 @@ import { Client, ClientInList } from '../_models/client';
 export class ApiService {
   constructor(private http: HttpClient, private env: EnvService) {}
 
-  uploadPicture(sub: string, body: Blob): Observable<void> {
+  uploadPicture(
+    sub: string,
+    body: Blob,
+    registrationToken?: string
+  ): Observable<void> {
     const formData = new FormData();
     formData.append('file', body);
-    return this.http.post<void>(`${this.env.apiUrl}/picture/${sub}`, formData);
+    const headers = {};
+    if (registrationToken != null) {
+      headers['X-Token'] = registrationToken;
+    }
+    return this.http.post<void>(`${this.env.apiUrl}/picture/${sub}`, formData, {
+      headers,
+    });
   }
 
   getUsers(): Observable<UsersListViewData> {
@@ -39,52 +49,59 @@ export class ApiService {
     return this.http.get<UserViewData>(`${this.env.apiUrl}/users/${userId}`);
   }
 
+  deleteUser(userId: string): Observable<void> {
+    return this.http.delete<void>(`${this.env.apiUrl}/users/${userId}`);
+  }
+
   reverifyEmail(userId: string): Observable<void> {
-    return this.http.patch<void>(
+    return this.http.post<void>(
       `${this.env.apiUrl}/users/${userId}/reverify-email`,
       null
     );
   }
 
-  getUserRegistration(registrationToken: string): Observable<UserViewData> {
-    return this.http.get<UserViewData>(
-      `${this.env.apiUrl}/register/${registrationToken}`,
-      {
-        headers: {
-          'X-Token': registrationToken,
-        },
-      }
+  resendRegistration(userId: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.env.apiUrl}/users/${userId}/resend-registration`,
+      null
     );
+  }
+
+  getUserRegistration(registrationToken: string): Observable<UserViewData> {
+    return this.http.get<UserViewData>(`${this.env.apiUrl}/register`, {
+      headers: {
+        'X-Token': registrationToken,
+      },
+    });
   }
 
   registerUser(registrationToken: string, userData: object): Observable<void> {
-    return this.http.put<void>(
-      `${this.env.apiUrl}/register/${registrationToken}`,
-      userData,
-      {
-        headers: {
-          'X-Token': registrationToken,
-        },
-      }
-    );
+    return this.http.put<void>(`${this.env.apiUrl}/register`, userData, {
+      headers: {
+        'X-Token': registrationToken,
+      },
+    });
   }
 
   verifyEmail(verifyToken: string): Observable<void> {
-    return this.http.put<void>(
-      `${this.env.apiUrl}/verify-email/${verifyToken}`,
-      null,
-      {
-        headers: {
-          'X-Token': verifyToken,
-        },
-      }
+    return this.http.put<void>(`${this.env.apiUrl}/verify-email`, null, {
+      headers: {
+        'X-Token': verifyToken,
+      },
+    });
+  }
+
+  requestResetUserPassword(userId: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.env.apiUrl}/users/${userId}/reset-password`,
+      null
     );
   }
 
   resetPassword(resetToken: string, newPassword: string): Observable<void> {
     return this.http.put<void>(
-      `${this.env.apiUrl}/reset-password/${resetToken}`,
-      { new_password: newPassword },
+      `${this.env.apiUrl}/reset-password`,
+      { password: newPassword },
       {
         headers: {
           'X-Token': resetToken,

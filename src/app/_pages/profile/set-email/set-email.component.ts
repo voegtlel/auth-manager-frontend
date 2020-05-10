@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { UserPropertyWithValue } from 'src/app/_models/user';
 import { ApiService } from 'src/app/_services/api.service';
 import { NbToastrService } from '@nebular/theme';
+import { AuthService } from 'src/app/_services/auth.service';
 
 @Component({
   selector: 'app-set-email',
@@ -10,6 +11,7 @@ import { NbToastrService } from '@nebular/theme';
 })
 export class SetEmailComponent {
   @Input() userId: string;
+  @Input() isActive: boolean;
   @Input() emailProperty: UserPropertyWithValue;
 
   updateValue: Record<string, any> = {};
@@ -18,12 +20,21 @@ export class SetEmailComponent {
   saving = false;
   lastError: string;
 
+  get isSelf(): boolean {
+    return this.authService.isSelf(this.userId);
+  }
+
+  get isAdmin(): boolean {
+    return this.authService.isAdmin;
+  }
+
   get hasChange(): boolean {
     return !!Object.keys(this.updateValue).length;
   }
 
   constructor(
     private apiService: ApiService,
+    private authService: AuthService,
     private toastr: NbToastrService
   ) {}
 
@@ -38,7 +49,7 @@ export class SetEmailComponent {
         .toPromise()
         .then(
           () => {
-            this.toastr.primary(
+            this.toastr.success(
               'Please check your new e-mail address for a verification link to activate the change.',
               'E-Mail Address Change',
               { duration: 5000 }
@@ -71,9 +82,47 @@ export class SetEmailComponent {
       .then(
         () => {
           this.saving = false;
-          this.toastr.primary(
-            'Please check your e-mail for a verification link.',
-            'E-Mail Verification',
+          if (this.isSelf) {
+            this.toastr.success(
+              'Please check your e-mail for a verification link.',
+              'E-Mail Verification',
+              { duration: 5000 }
+            );
+          } else {
+            this.toastr.success(
+              'E-mail with verification link was sent to the user.',
+              'E-Mail Verification',
+              { duration: 5000 }
+            );
+          }
+        },
+        (err) => {
+          this.saving = false;
+          if (err?.status === 0) {
+            this.toastr.danger(err?.statusText, 'Error');
+            this.lastError = err?.statusText;
+          } else if (err?.error?.detail) {
+            this.toastr.danger(err?.error?.detail, 'Error');
+            this.lastError = err?.error?.detail.toString();
+          } else if (err?.error) {
+            this.toastr.danger(err?.error, 'Error');
+            this.lastError = err?.error.toString();
+          }
+        }
+      );
+  }
+
+  resendEmailRegistration() {
+    this.saving = true;
+    this.apiService
+      .resendRegistration(this.userId)
+      .toPromise()
+      .then(
+        () => {
+          this.saving = false;
+          this.toastr.success(
+            'Sent registration form to user for (re-)registration.',
+            '(Re-)Registration',
             { duration: 5000 }
           );
         },

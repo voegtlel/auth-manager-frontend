@@ -1,11 +1,12 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
 import { ApiService } from 'src/app/_services/api.service';
 import { takeUntil, filter, switchMap, map } from 'rxjs/operators';
 import { Subject, of, combineLatest } from 'rxjs';
 import { UserViewData, UserPropertyWithValue } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NbToastrService } from '@nebular/theme';
+import { NbToastrService, NbDialogService, NbDialogRef } from '@nebular/theme';
+import { UsersService } from 'src/app/_services/users.service';
 
 @Component({
   templateUrl: './profile.component.html',
@@ -21,15 +22,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
   updateValues: Record<string, any> = {};
   valid = true;
   valids: Record<string, boolean> = {};
+  activeProperty: UserPropertyWithValue;
   saving = false;
   loading = true;
+
+  returnUrl: string = null;
 
   constructor(
     private api: ApiService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
-    private toastr: NbToastrService
+    private toastr: NbToastrService,
+    private dialogService: NbDialogService,
+    private usersService: UsersService
   ) {}
 
   ngOnDestroy() {
@@ -38,6 +44,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.route.queryParamMap
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe(
+        (queryParams) => (this.returnUrl = queryParams.get('return_url'))
+      );
     const userId$ = this.route.params.pipe(
       switchMap((params) =>
         params.userId
@@ -72,6 +83,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
         (profileData) => {
           this.loading = false;
           this.profileData = profileData;
+          this.activeProperty = profileData.properties.find(
+            (prop) => prop.key === 'active'
+          );
         },
         (err) => {
           this.loading = false;
@@ -127,7 +141,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
             () => {
               this.saving = false;
               this.updateValues = {};
-              this.router.navigate(['/registered']);
+              if (this.returnUrl) {
+                window.location.href = this.returnUrl;
+              } else {
+                this.router.navigate(['/registered']);
+              }
             },
             (err) => {
               this.saving = false;
@@ -151,7 +169,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
             () => {
               this.saving = false;
               this.updateValues = {};
-              this.router.navigate(['/users']);
+              this.usersService.invalidate();
+              if (this.returnUrl) {
+                window.location.href = this.returnUrl;
+              } else {
+                this.router.navigate(['/users']);
+              }
             },
             (err) => {
               this.saving = false;
@@ -175,6 +198,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
             () => {
               this.saving = false;
               this.updateValues = {};
+              if (this.returnUrl) {
+                window.location.href = this.returnUrl;
+              }
+              this.usersService.invalidate();
             },
             (err) => {
               this.saving = false;
@@ -192,5 +219,37 @@ export class ProfileComponent implements OnInit, OnDestroy {
           );
       }
     }
+  }
+
+  showDeleteUser(dialog: TemplateRef<any>) {
+    this.dialogService.open(dialog);
+  }
+
+  deleteUser(dialog: NbDialogRef<any>) {
+    this.saving = true;
+    dialog.close();
+    this.api
+      .deleteUser(this.userId)
+      .toPromise()
+      .then(
+        () => {
+          this.saving = false;
+          this.usersService.invalidate();
+          this.router.navigate(['/users']);
+        },
+        (err) => {
+          this.saving = false;
+          if (err?.status === 0) {
+            this.toastr.danger(err?.statusText, 'Error');
+            this.lastError = err?.statusText;
+          } else if (err?.error?.detail) {
+            this.toastr.danger(err?.error?.detail, 'Error');
+            this.lastError = err?.error?.detail.toString();
+          } else if (err?.error) {
+            this.toastr.danger(err?.error, 'Error');
+            this.lastError = err?.error.toString();
+          }
+        }
+      );
   }
 }

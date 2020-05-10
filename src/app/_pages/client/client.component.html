@@ -208,3 +208,39 @@
     </form>
   </nb-card-body>
 </nb-card>
+
+<nb-card *ngIf="!isNew">
+  <nb-card-header>Delete Client</nb-card-header>
+  <nb-card-body>
+    <button
+      nbButton
+      type="button"
+      status="danger"
+      (click)="showDeleteClient(deleteClientDialog)"
+    >
+      Delete Client
+    </button>
+  </nb-card-body>
+</nb-card>
+
+<ng-template #deleteClientDialog let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>Delete Client?</nb-card-header>
+    <nb-card-body>
+      <p>
+        Do you really want to delete the client? This cannot be undone!
+      </p>
+    </nb-card-body>
+    <nb-card-footer>
+      <button
+        nbButton
+        type="button"
+        status="danger"
+        (click)="deleteClient(ref)"
+      >
+        Delete
+      </button>
+      <button nbButton type="button" (click)="ref.close()">Cancel</button>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>

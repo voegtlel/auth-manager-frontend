@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
 import {
   FormGroup,
   FormControl,
@@ -11,7 +11,7 @@ import { Subject, Observable, of } from 'rxjs';
 import { ApiService } from 'src/app/_services/api.service';
 import { AuthService } from 'src/app/_services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NbToastrService } from '@nebular/theme';
+import { NbToastrService, NbDialogRef, NbDialogService } from '@nebular/theme';
 import { GroupWithId } from 'src/app/_models/user_group';
 
 @Component({
@@ -56,7 +56,8 @@ export class GroupComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
-    private toastr: NbToastrService
+    private toastr: NbToastrService,
+    private dialogService: NbDialogService
   ) {}
 
   ngOnDestroy() {
@@ -144,7 +145,7 @@ export class GroupComponent implements OnInit, OnDestroy {
             this.saving = false;
             this.form.markAsPristine();
             this.groupsService.reload();
-            // this.router.navigate(['/groups']);
+            this.router.navigate(['/groups']);
           },
           (err) => {
             this.saving = false;
@@ -192,5 +193,37 @@ export class GroupComponent implements OnInit, OnDestroy {
           }
         );
     }
+  }
+
+  showDeleteGroup(dialog: TemplateRef<any>) {
+    this.dialogService.open(dialog);
+  }
+
+  deleteGroup(dialog: NbDialogRef<any>) {
+    this.saving = true;
+    dialog.close();
+    this.api
+      .deleteGroup(this.groupId)
+      .toPromise()
+      .then(
+        () => {
+          this.saving = false;
+          this.groupsService.reload();
+          this.router.navigate(['/groups']);
+        },
+        (err) => {
+          this.saving = false;
+          if (err?.status === 0) {
+            this.toastr.danger(err?.statusText, 'Error');
+            this.lastError = err?.statusText;
+          } else if (err?.error?.detail) {
+            this.toastr.danger(err?.error?.detail, 'Error');
+            this.lastError = err?.error?.detail.toString();
+          } else if (err?.error) {
+            this.toastr.danger(err?.error, 'Error');
+            this.lastError = err?.error.toString();
+          }
+        }
+      );
   }
 }

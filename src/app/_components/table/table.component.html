@@ -15,6 +15,7 @@
   [nbTreeGrid]="dataSource"
   [nbSort]="dataSource"
   (sort)="updateSort($event)"
+  [nbSpinner]="loading"
 >
   <tr nbTreeGridHeaderRow *nbTreeGridHeaderRowDef="allColumns"></tr>
   <tr

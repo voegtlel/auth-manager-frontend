@@ -22,6 +22,7 @@ export class PictureEditorComponent implements OnInit {
   @Input() pictureUrl: string;
   @Input() userName: string;
   @Input() userId: string;
+  @Input() registrationToken: string;
 
   @Output() pictureChange = new EventEmitter<Blob>();
 
@@ -108,7 +109,9 @@ export class PictureEditorComponent implements OnInit {
     fetch(cropResult.base64)
       .then((res) => res.blob())
       .then((blob) => {
-        return this.apiService.uploadPicture(this.userId, blob).toPromise();
+        return this.apiService
+          .uploadPicture(this.userId, blob, this.registrationToken)
+          .toPromise();
       })
       .then(
         () => {

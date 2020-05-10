@@ -39,6 +39,7 @@ export class TableComponent implements OnChanges {
   sortColumn: string;
   sortDirection: NbSortDirection = NbSortDirection.NONE;
   dataSource: NbTreeGridDataSource<TableEntry> = null;
+  loading = true;
 
   @Input() readOnly = false;
 
@@ -55,11 +56,11 @@ export class TableComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.data) {
-      if (this.data) {
+      this.dataSource.setData([]);
+      setTimeout(() => {
         this.dataSource.setData(this.data);
-      } else {
-        this.dataSource.setData([]);
-      }
+        this.loading = false;
+      }, 0);
     }
     if (changes.columns) {
       if (this.columns) {

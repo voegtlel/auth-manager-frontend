@@ -70,7 +70,12 @@ export class MemberUsersComponent
       this.users$.pipe(filter((g) => !!g)),
       this.usersService.usersById$,
     ]).pipe(
-      map(([users, usersById]) => users.map((userUser) => usersById[userUser]))
+      map(([users, usersById]) =>
+        users.map(
+          (userUser) =>
+            usersById[userUser] || { properties: [], user_id: userUser }
+        )
+      )
     );
     this.usersData$ = users$.pipe(
       map((users) =>
@@ -108,7 +113,9 @@ export class MemberUsersComponent
         }))
       )
     );
-    this.columnsView$ = this.usersService.properties$;
+    this.columnsView$ = this.usersService.properties$.pipe(
+      map((properties) => properties.filter((prop) => prop.visible))
+    );
     this.columnsEdit$ = this.columnsView$.pipe(
       map((columns) =>
         columns.concat({
@@ -140,7 +147,8 @@ export class MemberUsersComponent
   removeUser(user: UserData) {
     const idx = this.users.indexOf(user.user_id);
     if (idx !== -1) {
-      this.users = this.users.slice(0, idx).concat(this.users.slice(idx + 1));
+      this.users = [...this.users];
+      this.users.splice(idx, 1);
       this.users$.next(this.users);
       this.usersChange.emit(this.users);
       if (this._onTouched) {

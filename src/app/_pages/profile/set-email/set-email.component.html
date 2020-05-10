@@ -1,6 +1,7 @@
 <form (submit)="submit($event)">
   <app-field-editor
     [userId]="userId"
+    [isActive]="isActive"
     [property]="emailProperty"
     overrideType="str"
     (valueChange)="onValueChange(emailProperty.key, $event)"
@@ -10,7 +11,20 @@
   <button nbButton type="submit" [disabled]="!valid || !hasChange">
     Set E-Mail Address
   </button>
-  <button nbButton type="button" (click)="resendEmailVerification()">
+  <button
+    nbButton
+    *ngIf="isAdmin"
+    type="button"
+    (click)="resendEmailVerification()"
+  >
     Resend E-Mail Verification
+  </button>
+  <button
+    nbButton
+    *ngIf="isAdmin"
+    type="button"
+    (click)="resendEmailRegistration()"
+  >
+    Resend E-Mail Registration
   </button>
 </form>

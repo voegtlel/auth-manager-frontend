@@ -102,5 +102,33 @@
   </nb-card-body>
 </nb-card>
 
-<pre>{{ form.value | json }}</pre>
-<pre>{{ form.get("id").errors | json }}</pre>
+<nb-card *ngIf="!isNew">
+  <nb-card-header>Delete Group</nb-card-header>
+  <nb-card-body>
+    <button
+      nbButton
+      type="button"
+      status="danger"
+      (click)="showDeleteGroup(deleteGroupDialog)"
+    >
+      Delete Group
+    </button>
+  </nb-card-body>
+</nb-card>
+
+<ng-template #deleteGroupDialog let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>Delete Group?</nb-card-header>
+    <nb-card-body>
+      <p>
+        Do you really want to delete the group? This cannot be undone!
+      </p>
+    </nb-card-body>
+    <nb-card-footer>
+      <button nbButton type="button" status="danger" (click)="deleteGroup(ref)">
+        Delete
+      </button>
+      <button nbButton type="button" (click)="ref.close()">Cancel</button>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>
