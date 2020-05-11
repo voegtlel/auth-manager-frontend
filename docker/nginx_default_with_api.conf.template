@@ -24,72 +24,42 @@ server {
     }
 
     location /api/v1/manager {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
         proxy_pass http://api/api/v1/manager;
     }
 
     location /authorize {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
         proxy_pass http://api/authorize;
     }
 
     location /token {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
         proxy_pass http://api/token;
     }
 
     location /token/revoke {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
         proxy_pass http://api/token/revoke;
     }
 
     location /userinfo {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
         proxy_pass http://api/userinfo;
     }
 
     location /picture {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
         proxy_pass http://api/picture;
     }
 
     location /login-status-iframe.html {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
         proxy_pass http://api/login-status-iframe.html;
     }
 
     location /end_session {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
         proxy_pass http://api/end_session;
     }
 
     location /.well-known/jwks {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
         proxy_pass http://api/.well-known/jwks;
     }
 
     location /.well-known/openid-configuration {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
         proxy_pass http://api/.well-known/openid-configuration;
     }
 }

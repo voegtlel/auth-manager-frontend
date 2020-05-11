@@ -31,6 +31,9 @@ services:
       # Forward backend to /api
       # (will set API_HOST='/api')
       PROXY_API_HOST: backend
+      # Set this if you're behind a reverse proxy:
+      # REAL_IP_RECURSIVE: on
+      # REAL_IP_HEADER: X-Real-Ip  # default: X-Real-Ip
       # OR: Host backend at separate URL:
       # API_HOST: 'auth.example.com'
       OICD_ISSUER: 'auth.example.com'
