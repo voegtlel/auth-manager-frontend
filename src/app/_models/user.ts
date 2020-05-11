@@ -19,6 +19,8 @@ export interface UserProperty {
   format_help: string;
   can_edit: 'everybody' | 'self' | 'admin' | 'nobody';
   can_read: 'everybody' | 'self' | 'admin' | 'nobody';
+  write_once: boolean;
+  default: any;
   visible: 'everybody' | 'self' | 'admin' | 'nobody';
   title: string;
   values: EnumValue[];

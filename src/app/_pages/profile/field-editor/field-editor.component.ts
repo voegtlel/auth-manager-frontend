@@ -64,9 +64,10 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   get canEdit(): boolean {
     return (
-      (this.property.can_edit === 'self' && (this.isSelf || this.isAdmin)) ||
-      (this.property.can_edit === 'admin' && this.isAdmin) ||
-      this.property.can_edit === 'everybody'
+      ((this.property.can_edit === 'self' && (this.isSelf || this.isAdmin)) ||
+        (this.property.can_edit === 'admin' && this.isAdmin) ||
+        this.property.can_edit === 'everybody') &&
+      (!this.property.write_once || this.registering || this.isNew)
     );
   }
 
