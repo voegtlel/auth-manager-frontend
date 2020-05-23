@@ -9,8 +9,7 @@ import {
   EventEmitter,
   forwardRef,
   ViewChild,
-  AfterViewInit,
-  ChangeDetectorRef,
+  OnInit,
 } from '@angular/core';
 import { NbDialogService } from '@nebular/theme';
 import { Subject, Observable, BehaviorSubject, combineLatest } from 'rxjs';
@@ -46,11 +45,11 @@ interface AccessGroupTableEntry extends TableEntry {
   ],
 })
 export class MemberGroupsAccessComponent
-  implements OnDestroy, OnChanges, AfterViewInit, ControlValueAccessor {
+  implements OnDestroy, OnChanges, OnInit, ControlValueAccessor {
   @Input() accessGroups: ClientAccessGroup[];
   @Output() accessGroupsChange = new EventEmitter<ClientAccessGroup[]>();
 
-  @ViewChild('rolesSelect') rolesSelect: TemplateRef<any>;
+  @ViewChild('rolesSelect', { static: true }) rolesSelect: TemplateRef<any>;
 
   destroyed$ = new Subject<void>();
 
@@ -60,11 +59,14 @@ export class MemberGroupsAccessComponent
   accessGroupsData$: Observable<AccessGroupTableEntry[]>;
 
   columnsView: TableColumn[] = [
+    { key: 'id', title: 'Id', clickableCells: true },
+    { key: 'group_name', title: 'Name', clickableCells: true },
+  ];
+
+  columnsEdit: TableColumn[] = [
     { key: 'id', title: 'Id' },
     { key: 'group_name', title: 'Name' },
   ];
-
-  columnsEdit: TableColumn[] = this.columnsView;
 
   loading = true;
   lastError: string;
@@ -73,8 +75,7 @@ export class MemberGroupsAccessComponent
 
   constructor(
     private groupsService: GroupsService,
-    private dialogService: NbDialogService,
-    private changeDetector: ChangeDetectorRef
+    private dialogService: NbDialogService
   ) {
     this.groupsService.groups$
       .pipe(takeUntil(this.destroyed$))
@@ -91,6 +92,8 @@ export class MemberGroupsAccessComponent
             id: userGroup.group,
             visible: false,
             group_name: userGroup.group,
+            enable_email: false,
+            enable_postbox: false,
           }),
           roles: userGroup.roles.join(','),
           index,
@@ -120,19 +123,11 @@ export class MemberGroupsAccessComponent
     );
   }
 
-  ngOnDestroy(): void {
-    this.destroyed$.next();
-    this.destroyed$.complete();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.groups) {
-      this.groups$.next(changes.groups.currentValue);
-    }
-  }
-
-  ngAfterViewInit() {
-    this.columnsEdit = this.columnsView.concat(
+  ngOnInit(): void {
+    this.columnsEdit = [
+      { key: 'id', title: 'Id' } as TableColumn,
+      { key: 'group_name', title: 'Name' } as TableColumn,
+    ].concat(
       {
         key: 'roles',
         title: 'Mapped Roles',
@@ -144,9 +139,19 @@ export class MemberGroupsAccessComponent
         title: '',
         icon: 'trash',
         compact: true,
-      }
+      } as TableColumn
     );
-    this.changeDetector.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.groups) {
+      this.groups$.next(changes.groups.currentValue);
+    }
   }
 
   onAddGroupDialog(dialogRef: TemplateRef<any>) {
@@ -192,11 +197,7 @@ export class MemberGroupsAccessComponent
     this.groups$.next(value);
   }
 
-  updateRoleInput(
-    row: AccessGroupTableEntry,
-    column: TableColumn,
-    $event: string
-  ): void {
+  updateRoleInput(row: AccessGroupTableEntry, $event: string): void {
     this.accessGroups[row.data.index].roles = $event.split(',');
     // Note: Do not next the groups$, because nothing changed in that structure.
     // this.groups$.next(this.accessGroups);

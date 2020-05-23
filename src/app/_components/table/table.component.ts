@@ -23,9 +23,13 @@ export interface TableColumn {
   title: string;
   icon?: string;
   compact?: boolean;
+  compact2?: boolean;
   onClickItem?: (entry: TableEntry, $event) => void;
   action?: (entry: TableEntry) => void;
   templateRef?: TemplateRef<any>;
+  clickableCells?: boolean;
+  centerCells?: boolean;
+  noPaddingCells?: boolean;
 }
 
 @Component({

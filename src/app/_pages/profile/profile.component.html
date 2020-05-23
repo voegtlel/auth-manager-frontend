@@ -22,9 +22,10 @@
           [userId]="profileData.user_id"
           [registrationToken]="registrationToken"
           [property]="property"
+          [propertiesByKey]="propertiesByKey"
           [isActive]="activeProperty?.value"
-          (valueChange)="onValueChange(property.key, $event)"
-          (validChange)="onValidChange(property.key, $event)"
+          (valueChange)="onValueChange($event.property.key, $event.value)"
+          (validChange)="onValidChange($event.property.key, $event.valid)"
         ></app-field-editor>
       </ng-container>
       <button nbButton type="submit" [disabled]="!valid || !hasChange">

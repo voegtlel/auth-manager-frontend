@@ -13,6 +13,7 @@ export class SetEmailComponent {
   @Input() userId: string;
   @Input() isActive: boolean;
   @Input() emailProperty: UserPropertyWithValue;
+  @Input() emailVerifiedProperty: UserPropertyWithValue;
 
   updateValue: Record<string, any> = {};
   valid = true;

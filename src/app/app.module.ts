@@ -70,6 +70,8 @@ import { MemberUsersComponent } from './_components/member-users/member-users.co
 import { ClientsComponent } from './_pages/clients/clients.component';
 import { ClientComponent } from './_pages/client/client.component';
 import { MemberGroupsAccessComponent } from './_components/member-groups-access/member-groups-access.component';
+import { MemberUsersAccessComponent } from './_components/member-users-access/member-users-access.component';
+import { MemberGroupsOptionsComponent } from './_components/member-groups-options/member-groups-options.component';
 
 @NgModule({
   declarations: [
@@ -87,7 +89,9 @@ import { MemberGroupsAccessComponent } from './_components/member-groups-access/
     RegisteredComponent,
     MemberGroupsComponent,
     MemberGroupsAccessComponent,
+    MemberGroupsOptionsComponent,
     MemberUsersComponent,
+    MemberUsersAccessComponent,
     TableComponent,
     GroupsComponent,
     GroupComponent,

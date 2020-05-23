@@ -8,6 +8,15 @@
     (validChange)="onValidChange(emailProperty.key, $event)"
     [externalError]="lastError"
   ></app-field-editor>
+  <app-field-editor
+    *ngIf="emailVerifiedProperty"
+    [userId]="userId"
+    [isActive]="isActive"
+    [property]="emailVerifiedProperty"
+    (valueChange)="onValueChange(emailVerifiedProperty.key, $event)"
+    (validChange)="onValidChange(emailVerifiedProperty.key, $event)"
+    [externalError]="lastError"
+  ></app-field-editor>
   <button nbButton type="submit" [disabled]="!valid || !hasChange">
     Set E-Mail Address
   </button>

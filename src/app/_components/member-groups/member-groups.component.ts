@@ -35,8 +35,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export class MemberGroupsComponent
   implements OnDestroy, OnChanges, ControlValueAccessor {
   @Input() groups: string[];
-  @Input() readOnly = false;
   @Output() groupsChange = new EventEmitter<string[]>();
+  @Input() readOnly = false;
   @Input() excludeGroups: string[] = [];
 
   destroyed$ = new Subject<void>();
@@ -48,17 +48,21 @@ export class MemberGroupsComponent
   groupsData$: Observable<TableEntry[]>;
 
   columnsView: TableColumn[] = [
-    { key: 'id', title: 'Id' },
-    { key: 'group_name', title: 'Name' },
+    { key: 'id', title: 'Id', clickableCells: true },
+    { key: 'group_name', title: 'Name', clickableCells: true },
   ];
 
-  columnsEdit: TableColumn[] = this.columnsView.concat({
-    action: (groupEntry: TableEntry) =>
-      this.removeGroup(groupEntry.data as GroupInList),
-    title: '',
-    icon: 'trash',
-    compact: true,
-  });
+  columnsEdit: TableColumn[] = [
+    { key: 'id', title: 'Id' },
+    { key: 'group_name', title: 'Name' },
+    {
+      action: (groupEntry: TableEntry) =>
+        this.removeGroup(groupEntry.data as GroupInList),
+      title: '',
+      icon: 'trash',
+      compact: true,
+    },
+  ];
 
   loading = true;
   lastError: string;
@@ -119,6 +123,19 @@ export class MemberGroupsComponent
   ngOnChanges(changes: SimpleChanges) {
     if (changes.groups) {
       this.groups$.next(changes.groups.currentValue);
+    }
+    if (changes.readOnly) {
+      if (changes.readOnly.currentValue) {
+        this.columnsEdit = this.columnsView;
+      } else {
+        this.columnsEdit = this.columnsView.concat({
+          action: (groupEntry: TableEntry) =>
+            this.removeGroup(groupEntry.data as GroupInList),
+          title: '',
+          icon: 'trash',
+          compact: true,
+        });
+      }
     }
   }
 

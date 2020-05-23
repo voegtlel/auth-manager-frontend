@@ -34,6 +34,7 @@
       [nbSortHeader]="getSortDirection(column.key)"
       [disabled]="!column.key"
       [class.compact-column]="column.compact"
+      [class.compact2-column]="column.compact2"
       *nbTreeGridHeaderCellDef
     >
       {{ column.title }}
@@ -42,7 +43,11 @@
       nbTreeGridCell
       *nbTreeGridCellDef="let row"
       [routerLink]="row.data.routerLink"
-      [class.clickable-row]="!readOnly"
+      [class.clickable-row]="!readOnly && column.clickableCells"
+      [class.center-cell]="column.centerCells"
+      [class.no-padding-cell]="
+        column.noPaddingCells || (!column.templateRef && column.action)
+      "
       (click)="onClickItem(row, column, $event)"
     >
       <ng-container *ngIf="!column.templateRef">
@@ -54,10 +59,13 @@
           nbButton
           type="button"
           (click)="column.action(row)"
+          fullWidth
           ghost
         >
           <nb-icon *ngIf="column.icon" [icon]="column.icon"></nb-icon
-          >{{ column.key ? row.data[column.key] : "" }}
+          ><ng-container *ngIf="column.key">{{
+            row.data[column.key]
+          }}</ng-container>
         </button>
       </ng-container>
       <ng-container *ngIf="column.templateRef">

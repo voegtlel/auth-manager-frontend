@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { NbDialogService } from '@nebular/theme';
 import { Subject, Observable, BehaviorSubject, combineLatest } from 'rxjs';
-import { takeUntil, map, filter, tap } from 'rxjs/operators';
+import { takeUntil, map, filter } from 'rxjs/operators';
 import {
   TableEntry,
   TableColumn,
@@ -114,9 +114,17 @@ export class MemberUsersComponent
       )
     );
     this.columnsView$ = this.usersService.properties$.pipe(
-      map((properties) => properties.filter((prop) => prop.visible))
+      map((properties) =>
+        properties
+          .filter((prop) => prop.visible)
+          .map((prop) => ({ ...prop, clickableCells: true }))
+      )
     );
-    this.columnsEdit$ = this.columnsView$.pipe(
+    this.columnsEdit$ = this.usersService.properties$.pipe(
+      map(
+        (properties) =>
+          properties.filter((prop) => prop.visible) as TableColumn[]
+      ),
       map((columns) =>
         columns.concat({
           action: (userEntry: TableEntry) =>

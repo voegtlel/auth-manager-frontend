@@ -8,7 +8,7 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { UserPropertyWithValue } from 'src/app/_models/user';
+import { UserPropertyWithValue, PropertyType } from 'src/app/_models/user';
 import { AuthService } from 'src/app/_services/auth.service';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil, map } from 'rxjs/operators';
@@ -24,11 +24,26 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() userId: string;
   @Input() registrationToken: string;
   @Input() property: UserPropertyWithValue;
+  @Input() propertiesByKey: Record<string, UserPropertyWithValue>;
   @Input() isActive: boolean;
-  @Input() overrideType: 'str' | 'datetime' | 'bool' | 'enum' = null;
+  @Input() overrideType:
+    | 'str'
+    | 'multistr'
+    | 'int'
+    | 'datetime'
+    | 'bool'
+    | 'enum' = null;
   @Input() externalError: string;
-  @Output() valueChange = new EventEmitter<any>();
-  @Output() validChange = new EventEmitter<boolean>();
+  @Output() valueChange = new EventEmitter<{
+    property: UserPropertyWithValue;
+    value: any;
+  }>();
+  @Output() validChange = new EventEmitter<{
+    property: UserPropertyWithValue;
+    valid: boolean;
+  }>();
+
+  additionalGroupProperties: UserPropertyWithValue[];
 
   _dateValueStr: string;
   _dateValue: Date;
@@ -45,17 +60,7 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
     return !!this.registrationToken;
   }
 
-  get propertyType():
-    | 'str'
-    | 'multistr'
-    | 'datetime'
-    | 'date'
-    | 'bool'
-    | 'enum'
-    | 'picture'
-    | 'email'
-    | 'password'
-    | 'groups' {
+  get propertyType(): PropertyType {
     if (this.overrideType) {
       return this.overrideType;
     }
@@ -122,7 +127,7 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     const isValid = this.formatMatch && this.requiredMatch;
     if (wasValid !== isValid) {
-      this.validChange.emit(isValid);
+      this.validChange.emit({ property: this.property, valid: isValid });
     }
   }
 
@@ -166,7 +171,7 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     const isValid = this.formatMatch && this.requiredMatch;
     if (wasValid !== isValid) {
-      this.validChange.emit(isValid);
+      this.validChange.emit({ property: this.property, valid: isValid });
     }
     // console.log('Validity:', this.property.key, isValid);
   }
@@ -174,6 +179,13 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.property) {
       this.validate();
+    }
+    if (changes.propertiesByKey) {
+      this.additionalGroupProperties = [
+        changes.propertiesByKey.currentValue.email_allowed_forward_groups,
+        changes.propertiesByKey.currentValue.email_forward_groups,
+        changes.propertiesByKey.currentValue.email_postbox_access_groups,
+      ].filter((x) => !!x);
     }
   }
 

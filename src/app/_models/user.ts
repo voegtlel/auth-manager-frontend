@@ -3,25 +3,30 @@ export interface EnumValue {
   title: string;
 }
 
+export type PermissionType = 'everybody' | 'self' | 'admin' | 'nobody';
+
+export type PropertyType =
+  | 'str'
+  | 'multistr'
+  | 'int'
+  | 'datetime'
+  | 'date'
+  | 'bool'
+  | 'enum'
+  | 'picture'
+  | 'email'
+  | 'password'
+  | 'groups';
+
 export interface UserProperty {
-  type:
-    | 'str'
-    | 'multistr'
-    | 'datetime'
-    | 'date'
-    | 'bool'
-    | 'enum'
-    | 'picture'
-    | 'email'
-    | 'password'
-    | 'groups';
+  type: PropertyType;
   format: string;
   format_help: string;
-  can_edit: 'everybody' | 'self' | 'admin' | 'nobody';
-  can_read: 'everybody' | 'self' | 'admin' | 'nobody';
+  can_edit: PermissionType;
+  can_read: PermissionType;
   write_once: boolean;
   default: any;
-  visible: 'everybody' | 'self' | 'admin' | 'nobody';
+  visible: PermissionType;
   title: string;
   values: EnumValue[];
   template: string;

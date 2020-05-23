@@ -42,7 +42,10 @@ export class UsersComponent implements OnInit, OnDestroy {
               { user_id: user.user_id, routerLink: ['/users', user.user_id] }
             ),
           }));
-          this.columns = usersData.properties;
+          this.columns = usersData.properties.map((property) => ({
+            ...property,
+            clickableCells: true,
+          }));
         },
         (err) => {
           this.usersData = [];

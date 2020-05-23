@@ -49,6 +49,31 @@
       {{ externalErrorMessage }}
     </div>
   </div>
+  <div *ngSwitchCase="'int'" class="form-control-group">
+    <label class="label" [for]="formControlEl">{{ property.title }}</label>
+    <input
+      type="number"
+      nbInput
+      fullWidth
+      fieldSize="medium"
+      [placeholder]="property.title"
+      [name]="property.key"
+      [(ngModel)]="property.value"
+      (ngModelChange)="onChange()"
+      [readOnly]="!canEdit"
+      [status]="
+        externalError || !formatMatch || !requiredMatch ? 'danger' : 'basic'
+      "
+      #formControlEl
+    />
+    <div *ngIf="!requiredMatch" class="error-message">Required.</div>
+    <div *ngIf="!formatMatch && requiredMatch" class="error-message">
+      Invalid format, must match {{ property.format_help }}.
+    </div>
+    <div *ngIf="externalError" class="error-message">
+      {{ externalErrorMessage }}
+    </div>
+  </div>
   <div *ngSwitchCase="'bool'" class="form-control-group">
     <nb-checkbox
       fullWidth
@@ -196,6 +221,14 @@
         (validChange)="validChange.emit($event)"
         [externalError]="externalError"
       ></app-field-editor>
+      <app-field-editor
+        *ngIf="propertiesByKey.email_verified"
+        [property]="propertiesByKey.email_verified"
+        [isActive]="isActive"
+        (valueChange)="valueChange.emit($event)"
+        (validChange)="validChange.emit($event)"
+        [externalError]="externalError"
+      ></app-field-editor>
       <div class="spacing">
         <hr />
       </div>
@@ -203,6 +236,7 @@
     <ng-template #emailEdit>
       <app-set-email
         [emailProperty]="property"
+        [emailVerifiedProperty]="propertiesByKey.email_verified"
         [isActive]="isActive"
         [userId]="userId"
       ></app-set-email>
@@ -212,10 +246,17 @@
     </ng-template>
   </ng-container>
   <ng-container *ngSwitchCase="'groups'">
-    <app-member-groups
+    <app-member-groups-options
       [groups]="property.value"
-      (groupsChange)="property.value = $event; valueChange.emit($event)"
+      (groupsChange)="
+        property.value = $event;
+        valueChange.emit({ property: property, value: $event })
+      "
+      [additionalGroups]="additionalGroupProperties"
+      (additionalGroupsChange)="valueChange.emit($event)"
+      [isAdmin]="isAdmin"
+      [isSelf]="isSelf"
       [readOnly]="!canEdit"
-    ></app-member-groups>
+    ></app-member-groups-options>
   </ng-container>
 </ng-container>

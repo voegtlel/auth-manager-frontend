@@ -15,6 +15,7 @@ import { UsersService } from 'src/app/_services/users.service';
 export class ProfileComponent implements OnInit, OnDestroy {
   destroyed$ = new Subject<void>();
   profileData: UserViewData = null;
+  propertiesByKey: Record<string, UserPropertyWithValue> = null;
   userId: string;
   registrationToken: string;
 
@@ -83,9 +84,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
         (profileData) => {
           this.loading = false;
           this.profileData = profileData;
-          this.activeProperty = profileData.properties.find(
-            (prop) => prop.key === 'active'
+          this.propertiesByKey = profileData.properties.reduce(
+            (o, property) => {
+              o[property.key] = property;
+              return o;
+            },
+            {}
           );
+          this.activeProperty = this.propertiesByKey.active;
         },
         (err) => {
           this.loading = false;

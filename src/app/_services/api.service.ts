@@ -110,19 +110,6 @@ export class ApiService {
     );
   }
 
-  addUserGroup(userId: string, groupId: string): Observable<void> {
-    return this.http.post<void>(
-      `${this.env.apiUrl}/users/${userId}/groups/${groupId}`,
-      null
-    );
-  }
-
-  removeUserGroup(userId: string, groupId: string): Observable<void> {
-    return this.http.delete<void>(
-      `${this.env.apiUrl}/users/${userId}/groups/${groupId}`
-    );
-  }
-
   createGroup(data: GroupWithId): Observable<void> {
     return this.http.post<void>(`${this.env.apiUrl}/groups`, data);
   }
@@ -131,8 +118,8 @@ export class ApiService {
     return this.http.get<GroupInList[]>(`${this.env.apiUrl}/groups`);
   }
 
-  getGroup(groupId: string): Observable<Group> {
-    return this.http.get<Group>(`${this.env.apiUrl}/groups/${groupId}`);
+  getGroup(groupId: string): Observable<GroupWithId> {
+    return this.http.get<GroupWithId>(`${this.env.apiUrl}/groups/${groupId}`);
   }
 
   updateGroup(groupId: string, data: Group): Observable<void> {

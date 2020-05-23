@@ -15,7 +15,7 @@ import { takeUntil } from 'rxjs/operators';
 export class ClientsComponent implements OnInit, OnDestroy {
   destroyed$ = new Subject<void>();
   clientsData: TableEntry[] = null;
-  columns: TableColumn[] = [{ key: 'id', title: 'Id' }];
+  columns: TableColumn[] = [{ key: 'id', title: 'Id', clickableCells: true }];
 
   constructor(
     private clientsService: ClientsService,

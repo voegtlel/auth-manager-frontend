@@ -16,8 +16,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
   destroyed$ = new Subject<void>();
   groupsData: TableEntry[] = null;
   columns: TableColumn[] = [
-    { key: 'id', title: 'Id' },
-    { key: 'group_name', title: 'Name' },
+    { key: 'id', title: 'Id', clickableCells: true },
+    { key: 'group_name', title: 'Name', clickableCells: true },
   ];
 
   constructor(
