@@ -59,6 +59,8 @@ services:
       API_CONFIG_OAUTH2_KEYS_0_KEY_FILE: '/app/key.private'
       API_CONFIG_OAUTH2_BASE_URL: 'https://auth.example.com'
       API_CONFIG_OAUTH2_ISSUER: 'auth.example.com'
+      API_CONFIG_OAUTH2_MAIL_DOMAIN: 'example.com'
+      API_CONFIG_OAUTH2_MAIL_API_KEY: 'generate random string here'
       API_CONFIG_MANAGER_BACKEND_CORS_ORIGIN: 'https://auth.example.com'
       API_CONFIG_MANAGER_BACKEND_BASE_URL: 'https://auth.example.com/manager'
       API_CONFIG_MANAGER_FRONTEND_BASE_URL: 'https://auth.example.com'
