@@ -21,6 +21,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   lastError: string;
   updateValues: Record<string, any> = {};
+  sendRegistrationLink = true;
   valid = true;
   valids: Record<string, boolean> = {};
   activeProperty: UserPropertyWithValue;
@@ -169,7 +170,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           );
       } else if (this.isNew) {
         this.api
-          .createUser(this.updateValues)
+          .createUser(this.updateValues, !this.sendRegistrationLink)
           .toPromise()
           .then(
             () => {

@@ -217,38 +217,10 @@ export class ClientComponent implements OnInit, OnDestroy {
     }
   }
 
-  generatePassword(length?: number) {
-    if (!window.crypto?.getRandomValues) {
-      return;
-    }
-    if (length == null) {
-      length = 24;
-    }
-
-    const b64 =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678901=';
-    const randomData = new Uint8Array(length);
-    window.crypto.getRandomValues(randomData);
-    let result = '';
-    let a: number;
-    let b: number;
-    let c: number;
-    let bits: number;
-    let i = 0;
-    while (i < randomData.length) {
-      a = randomData[i++];
-      b = randomData[i++];
-      c = randomData[i++];
-      // @ts-ignore
-      bits = (a << 16) | (b << 8) | c;
-      // @ts-ignore
-      result +=
-        b64.charAt((bits >> 18) & 63) +
-        b64.charAt((bits >> 12) & 63) +
-        b64.charAt((bits >> 6) & 63) +
-        b64.charAt(bits & 63);
-    }
-    this.form.get('client_secret').setValue(result);
+  generatePassword() {
+    this.form
+      .get('client_secret')
+      .setValue(this.authService.generatePassword());
   }
 
   validateGrantTypes(control: AbstractControl): ValidationErrors {

@@ -15,9 +15,10 @@
       <ng-container *ngFor="let property of profileData?.properties">
         <app-field-editor
           *ngIf="
-            property.visible === 'everybody' ||
-            (property.visible === 'self' && (isSelf || isAdmin)) ||
-            (property.visible === 'admin' && isAdmin)
+            (property.visible === 'everybody' ||
+              (property.visible === 'self' && (isSelf || isAdmin)) ||
+              (property.visible === 'admin' && isAdmin)) &&
+            (!property.template || (!isNew && !registrationToken))
           "
           [userId]="profileData.user_id"
           [registrationToken]="registrationToken"
@@ -28,6 +29,17 @@
           (validChange)="onValidChange($event.property.key, $event.valid)"
         ></app-field-editor>
       </ng-container>
+      <div class="spacing">
+        <hr />
+      </div>
+      <div class="form-control-group">
+        <nb-checkbox
+          *ngIf="!registrationToken && isNew"
+          [(ngModel)]="sendRegistrationLink"
+          [ngModelOptions]="{ standalone: true }"
+          >Send registration link</nb-checkbox
+        >
+      </div>
       <button nbButton type="submit" [disabled]="!valid || !hasChange">
         <ng-container *ngIf="registrationToken"
           >Finish Registration</ng-container

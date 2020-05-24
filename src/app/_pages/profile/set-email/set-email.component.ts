@@ -14,6 +14,9 @@ export class SetEmailComponent {
   @Input() isActive: boolean;
   @Input() emailProperty: UserPropertyWithValue;
   @Input() emailVerifiedProperty: UserPropertyWithValue;
+  @Input() emailForwardProperty: UserPropertyWithValue;
+  @Input() hasEmailAliasProperty: UserPropertyWithValue;
+  @Input() emailAliasProperty: UserPropertyWithValue;
 
   updateValue: Record<string, any> = {};
   valid = true;
@@ -50,11 +53,15 @@ export class SetEmailComponent {
         .toPromise()
         .then(
           () => {
-            this.toastr.success(
-              'Please check your new e-mail address for a verification link to activate the change.',
-              'E-Mail Address Change',
-              { duration: 5000 }
-            );
+            if (this.updateValue[this.emailProperty.key]) {
+              if (this.isSelf) {
+                this.toastr.success(
+                  'Please check your new e-mail address for a verification link to activate the change.',
+                  'E-Mail Address Change',
+                  { duration: 5000 }
+                );
+              }
+            }
             this.updateValue = {};
             this.saving = false;
           },

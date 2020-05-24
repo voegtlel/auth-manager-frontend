@@ -3,7 +3,12 @@ export interface EnumValue {
   title: string;
 }
 
-export type PermissionType = 'everybody' | 'self' | 'admin' | 'nobody';
+export type PermissionType =
+  | 'everybody'
+  | 'self'
+  | 'only_self'
+  | 'admin'
+  | 'nobody';
 
 export type PropertyType =
   | 'str'

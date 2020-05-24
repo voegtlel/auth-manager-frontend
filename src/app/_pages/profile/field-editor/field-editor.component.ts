@@ -53,6 +53,7 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   formatMatch = true;
   requiredMatch = true;
+  tokenVisible = false;
 
   private destroyed$ = new Subject<void>();
 
@@ -70,6 +71,7 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
   get canEdit(): boolean {
     return (
       ((this.property.can_edit === 'self' && (this.isSelf || this.isAdmin)) ||
+        (this.property.can_edit === 'only_self' && this.isSelf) ||
         (this.property.can_edit === 'admin' && this.isAdmin) ||
         this.property.can_edit === 'everybody') &&
       (!this.property.write_once || this.registering || this.isNew)
@@ -112,7 +114,10 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
       ) {
         this.requiredMatch = false;
       }
-      this.valueChange.emit(this.property.value);
+      this.valueChange.emit({
+        property: this.property,
+        value: this.property.value,
+      });
     } else if (value !== this._dateValue) {
       this.requiredMatch = true;
       this._dateValue = value;
@@ -123,7 +128,10 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
         '-' +
         ('0' + value.getDate()).substr(-2);
       this.property.value = this._dateValueStr;
-      this.valueChange.emit(this.property.value);
+      this.valueChange.emit({
+        property: this.property,
+        value: this.property.value,
+      });
     }
     const isValid = this.formatMatch && this.requiredMatch;
     if (wasValid !== isValid) {
@@ -176,6 +184,11 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
     // console.log('Validity:', this.property.key, isValid);
   }
 
+  generateToken() {
+    this.property.value = this.authService.generatePassword();
+    this.onChange();
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes.property) {
       this.validate();
@@ -191,6 +204,9 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
 
   onChange() {
     this.validate();
-    this.valueChange.emit(this.property.value);
+    this.valueChange.emit({
+      property: this.property,
+      value: this.property.value,
+    });
   }
 }

@@ -37,8 +37,12 @@ export class ApiService {
     return this.http.get<UserViewData>(`${this.env.apiUrl}/users/new`);
   }
 
-  createUser(updates: object): Observable<void> {
-    return this.http.post<void>(`${this.env.apiUrl}/users`, updates);
+  createUser(updates: object, noRegistration?: boolean): Observable<void> {
+    let query = '';
+    if (noRegistration) {
+      query = '?no_registration=true';
+    }
+    return this.http.post<void>(`${this.env.apiUrl}/users${query}`, updates);
   }
 
   updateUser(userId: string, updates: object): Observable<void> {

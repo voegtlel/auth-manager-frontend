@@ -15,3 +15,10 @@
 textarea {
   resize: vertical;
 }
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  margin-left: -3em;
+  width: 6em;
+}

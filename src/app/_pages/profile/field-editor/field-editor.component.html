@@ -1,4 +1,7 @@
 <ng-container [ngSwitch]="propertyType">
+  <div *ngSwitchCase="'separator'" class="spacing">
+    <hr />
+  </div>
   <div *ngSwitchCase="'str'" class="form-control-group">
     <label class="label" [for]="formControlEl">{{ property.title }}</label>
     <input
@@ -41,6 +44,47 @@
       "
       #formControlEl
     ></textarea>
+    <div *ngIf="!requiredMatch" class="error-message">Required.</div>
+    <div *ngIf="!formatMatch && requiredMatch" class="error-message">
+      Invalid format, must match {{ property.format_help }}.
+    </div>
+    <div *ngIf="externalError" class="error-message">
+      {{ externalErrorMessage }}
+    </div>
+  </div>
+  <div *ngSwitchCase="'token'" class="form-control-group">
+    <label class="label" [for]="formControlEl">{{ property.title }}</label>
+    <nb-form-field>
+      <div nbSuffix class="buttons">
+        <button nbButton ghost type="button" (click)="generateToken()">
+          <nb-icon icon="sync"></nb-icon>
+        </button>
+        <button
+          nbSuffix
+          nbButton
+          ghost
+          type="button"
+          (click)="tokenVisible = !tokenVisible"
+        >
+          <nb-icon [icon]="tokenVisible ? 'eye' : 'eye-off'"></nb-icon>
+        </button>
+      </div>
+      <input
+        [type]="tokenVisible ? 'text' : 'password'"
+        nbInput
+        fullWidth
+        fieldSize="medium"
+        [placeholder]="property.title"
+        [name]="property.key"
+        [(ngModel)]="property.value"
+        (ngModelChange)="onChange()"
+        [readOnly]="!canEdit"
+        [status]="
+          externalError || !formatMatch || !requiredMatch ? 'danger' : 'basic'
+        "
+        #formControlEl
+      />
+    </nb-form-field>
     <div *ngIf="!requiredMatch" class="error-message">Required.</div>
     <div *ngIf="!formatMatch && requiredMatch" class="error-message">
       Invalid format, must match {{ property.format_help }}.
@@ -237,6 +281,9 @@
       <app-set-email
         [emailProperty]="property"
         [emailVerifiedProperty]="propertiesByKey.email_verified"
+        [emailForwardProperty]="propertiesByKey.forward_emails"
+        [hasEmailAliasProperty]="propertiesByKey.has_email_alias"
+        [emailAliasProperty]="propertiesByKey.email_alias"
         [isActive]="isActive"
         [userId]="userId"
       ></app-set-email>

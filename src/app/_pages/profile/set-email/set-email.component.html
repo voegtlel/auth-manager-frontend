@@ -4,7 +4,7 @@
     [isActive]="isActive"
     [property]="emailProperty"
     overrideType="str"
-    (valueChange)="onValueChange(emailProperty.key, $event)"
+    (valueChange)="onValueChange($event.property.key, $event.value)"
     (validChange)="onValidChange(emailProperty.key, $event)"
     [externalError]="lastError"
   ></app-field-editor>
@@ -13,12 +13,35 @@
     [userId]="userId"
     [isActive]="isActive"
     [property]="emailVerifiedProperty"
-    (valueChange)="onValueChange(emailVerifiedProperty.key, $event)"
+    (valueChange)="onValueChange($event.property.key, $event.value)"
     (validChange)="onValidChange(emailVerifiedProperty.key, $event)"
-    [externalError]="lastError"
+  ></app-field-editor>
+  <app-field-editor
+    *ngIf="emailForwardProperty"
+    [userId]="userId"
+    [isActive]="isActive"
+    [property]="emailForwardProperty"
+    (valueChange)="onValueChange($event.property.key, $event.value)"
+    (validChange)="onValidChange(emailForwardProperty.key, $event)"
+  ></app-field-editor>
+  <app-field-editor
+    *ngIf="hasEmailAliasProperty"
+    [userId]="userId"
+    [isActive]="isActive"
+    [property]="hasEmailAliasProperty"
+    (valueChange)="onValueChange($event.property.key, $event.value)"
+    (validChange)="onValidChange(hasEmailAliasProperty.key, $event)"
+  ></app-field-editor>
+  <app-field-editor
+    *ngIf="emailAliasProperty && hasEmailAliasProperty?.value"
+    [userId]="userId"
+    [isActive]="isActive"
+    [property]="emailAliasProperty"
+    (valueChange)="onValueChange($event.property.key, $event.value)"
+    (validChange)="onValidChange(emailAliasProperty.key, $event)"
   ></app-field-editor>
   <button nbButton type="submit" [disabled]="!valid || !hasChange">
-    Set E-Mail Address
+    Save E-Mail
   </button>
   <button
     nbButton
