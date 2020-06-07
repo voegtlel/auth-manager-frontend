@@ -53,6 +53,9 @@ services:
       # Override any config.yaml variable by typing API_CONFIG_<container>_<container...>_<variable>
       # where the names are automagically converted from camelCase to underscore_notation (ignoring casing).
 
+      # Set this if you use different origin
+      # API_CONFIG_ALLOW_ORIGINS: "['https://auth.example.com']"
+
       API_CONFIG_MONGO_URI: "mongodb://auth:<mongopw>@mongo/auth"
 
       # Generate this by: `openssl genrsa -out key.private 4096`

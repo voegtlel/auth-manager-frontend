@@ -1,0 +1,28 @@
+<nb-form-field
+  *ngFor="let control of entriesFormArray.controls; let idx = index"
+>
+  <input
+    type="text"
+    nbInput
+    fullWidth
+    [placeholder]="placeholder"
+    [formControl]="control"
+  />
+  <button type="button" nbSuffix nbButton ghost (click)="removeEntry(idx)">
+    <nb-icon icon="minus" aria-label="remove"></nb-icon>
+  </button>
+</nb-form-field>
+<form (submit)="addEntry($event)">
+  <nb-form-field>
+    <input
+      type="text"
+      nbInput
+      fullWidth
+      [placeholder]="placeholderAdd"
+      [formControl]="clientIdControl"
+    />
+    <button type="submit" nbSuffix nbButton ghost>
+      <nb-icon icon="plus" aria-label="add"></nb-icon>
+    </button>
+  </nb-form-field>
+</form>

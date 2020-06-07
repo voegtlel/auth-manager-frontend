@@ -5,6 +5,7 @@ import {
   AbstractControl,
   Validators,
   ValidationErrors,
+  FormArray,
 } from '@angular/forms';
 import { ClientsService } from 'src/app/_services/clients.service';
 import { takeUntil, map, switchMap, tap, take, filter } from 'rxjs/operators';
@@ -43,14 +44,14 @@ export class ClientComponent implements OnInit, OnDestroy {
 
   canGeneratePassword = !!window.crypto?.getRandomValues;
 
-  private _clientFormElements: Record<keyof Client, FormControl> = {
+  private _clientFormElements: Record<keyof Client, FormControl | FormArray> = {
     id: new FormControl(
       null,
       [Validators.required, Validators.pattern(/^[a-zA-Z0-9_.+-]+$/)],
       [(x) => this.validateFormId(x)]
     ),
     notes: new FormControl(null),
-    redirect_uri: new FormControl([]),
+    redirect_uri: new FormArray([]),
     allowed_scope: new FormControl([]),
     client_secret: new FormControl(null),
     token_endpoint_auth_method: new FormControl([]),
@@ -103,7 +104,7 @@ export class ClientComponent implements OnInit, OnDestroy {
         takeUntil(this.destroyed$)
       )
       .subscribe(
-        (clientData) => {
+        (clientData: Client) => {
           this.loading = false;
           if (clientData === null) {
             this.form.reset({
@@ -117,9 +118,22 @@ export class ClientComponent implements OnInit, OnDestroy {
               grant_type: [],
               access_groups: [],
             } as Client);
+            const redirectUriFormArray = this._clientFormElements
+              .redirect_uri as FormArray;
+            while (redirectUriFormArray.length > 0) {
+              redirectUriFormArray.removeAt(0);
+            }
             this.form.updateValueAndValidity();
             console.log('Reset form:', this.form.value);
           } else {
+            const redirectUriFormArray = this._clientFormElements
+              .redirect_uri as FormArray;
+            while (redirectUriFormArray.length > 0) {
+              redirectUriFormArray.removeAt(0);
+            }
+            for (const clientUri of clientData.redirect_uri) {
+              redirectUriFormArray.push(new FormControl(clientUri));
+            }
             this.form.reset(clientData);
             this.form.updateValueAndValidity();
           }

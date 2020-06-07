@@ -72,6 +72,7 @@ import { ClientComponent } from './_pages/client/client.component';
 import { MemberGroupsAccessComponent } from './_components/member-groups-access/member-groups-access.component';
 import { MemberUsersAccessComponent } from './_components/member-users-access/member-users-access.component';
 import { MemberGroupsOptionsComponent } from './_components/member-groups-options/member-groups-options.component';
+import { StringListEditComponent } from './_components/string-list-edit/string-list-edit.component';
 
 @NgModule({
   declarations: [
@@ -97,6 +98,7 @@ import { MemberGroupsOptionsComponent } from './_components/member-groups-option
     GroupComponent,
     ClientsComponent,
     ClientComponent,
+    StringListEditComponent,
   ],
   imports: [
     BrowserModule,
