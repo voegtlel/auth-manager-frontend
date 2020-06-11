@@ -5,21 +5,26 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-import { OAuthService } from 'angular-oauth2-oidc';
+import { AuthService } from './auth.service';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private oauthService: OAuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): boolean {
-    if (this.oauthService.hasValidIdToken()) {
-      return true;
-    }
-
-    this.router.navigate(['']);
-    return false;
+  ): Observable<boolean> {
+    return this.authService.loggedIn$.pipe(
+      map((loggedIn) => {
+        if (!loggedIn) {
+          this.router.navigate([''], { queryParams: { returnUrl: state.url } });
+          return false;
+        }
+        return true;
+      })
+    );
   }
 }

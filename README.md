@@ -64,7 +64,7 @@ services:
       API_CONFIG_OAUTH2_ISSUER: 'auth.example.com'
       API_CONFIG_OAUTH2_MAIL_DOMAIN: 'example.com'
       API_CONFIG_OAUTH2_MAIL_API_KEY: 'generate random string here'
-      API_CONFIG_MANAGER_BACKEND_CORS_ORIGIN: 'https://auth.example.com'
+      API_CONFIG_MANAGER_BACKEND_CORS_ORIGIN: '["https://auth.example.com"]'
       API_CONFIG_MANAGER_BACKEND_BASE_URL: 'https://auth.example.com/manager'
       API_CONFIG_MANAGER_FRONTEND_BASE_URL: 'https://auth.example.com'
       API_CONFIG_MANAGER_SECRET_KEY: <generate a random string here>
