@@ -110,7 +110,7 @@ export class ClientComponent implements OnInit, OnDestroy {
             this.form.reset({
               id: null,
               notes: null,
-              redirect_uri: [],
+              redirect_uri: [''],
               allowed_scope: [],
               client_secret: null,
               token_endpoint_auth_method: [],
@@ -123,6 +123,7 @@ export class ClientComponent implements OnInit, OnDestroy {
             while (redirectUriFormArray.length > 0) {
               redirectUriFormArray.removeAt(0);
             }
+            redirectUriFormArray.push(new FormControl(''));
             this.form.updateValueAndValidity();
             console.log('Reset form:', this.form.value);
           } else {

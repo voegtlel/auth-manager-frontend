@@ -69,7 +69,7 @@ export class StringListEditComponent implements OnInit, OnChanges, OnDestroy {
     if (this.disabled) {
       return;
     }
-    const newControl = new FormControl(this.clientIdControl.value);
+    const newControl = new FormControl('');
     this.entriesFormArray.push(newControl);
     newControl.markAsDirty();
     newControl.markAsTouched();

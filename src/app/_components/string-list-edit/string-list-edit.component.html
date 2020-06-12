@@ -12,17 +12,12 @@
     <nb-icon icon="minus" aria-label="remove"></nb-icon>
   </button>
 </nb-form-field>
-<form (submit)="addEntry($event)">
-  <nb-form-field>
-    <input
-      type="text"
-      nbInput
-      fullWidth
-      [placeholder]="placeholderAdd"
-      [formControl]="clientIdControl"
-    />
-    <button type="submit" nbSuffix nbButton ghost>
-      <nb-icon icon="plus" aria-label="add"></nb-icon>
-    </button>
-  </nb-form-field>
-</form>
+<button
+  type="button"
+  nbButton
+  ghost
+  (click)="addEntry($event)"
+  *ngIf="!this.disabled"
+>
+  <nb-icon icon="plus" aria-label="add"></nb-icon>
+</button>

@@ -56,6 +56,9 @@ services:
       # Set this if you use different origin
       # API_CONFIG_ALLOW_ORIGINS: "['https://auth.example.com']"
 
+      # Allow proxy headers from everywhere (using nginx from the frontend)
+      GUNICORN_CMD_ARGS: '--forwarded-allow-ips=*'
+
       API_CONFIG_MONGO_URI: "mongodb://auth:<mongopw>@mongo/auth"
 
       # Generate this by: `openssl genrsa -out key.private 4096`
