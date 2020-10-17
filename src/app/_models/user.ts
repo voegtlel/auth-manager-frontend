@@ -13,6 +13,7 @@ export type PermissionType =
 export type PropertyType =
   | 'str'
   | 'multistr'
+  | 'token'
   | 'int'
   | 'datetime'
   | 'date'
@@ -21,7 +22,8 @@ export type PropertyType =
   | 'picture'
   | 'email'
   | 'password'
-  | 'groups';
+  | 'groups'
+  | 'access_token';
 
 export interface UserProperty {
   type: PropertyType;
@@ -36,6 +38,12 @@ export interface UserProperty {
   values: EnumValue[];
   template: string;
   required: boolean;
+}
+
+export interface UserPasswordAccessToken {
+  id?: string;
+  description: string;
+  token?: string;
 }
 
 export interface UserPropertyWithKey extends UserProperty {

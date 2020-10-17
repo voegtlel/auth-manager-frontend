@@ -1,0 +1,49 @@
+<nb-card>
+  <nb-card-header>
+    <span>Access Tokens</span>
+    <nb-actions *ngIf="!readOnly">
+      <nb-action
+        icon="plus"
+        (click)="onAddAccessTokenDialog(addAccessTokenDialog)"
+        >Add</nb-action
+      >
+    </nb-actions>
+  </nb-card-header>
+  <nb-card-body>
+    <app-table
+      [columns]="columnsEdit"
+      [data]="accessTokensData$ | async"
+    ></app-table>
+  </nb-card-body>
+</nb-card>
+
+<ng-template #addAccessTokenDialog let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>
+      <span>Create Access Token</span>
+    </nb-card-header>
+    <nb-card-body>
+      <form (submit)="ref.close(); addAccessTokenSubmit($event, ref)">
+        <app-field-editor
+          [isActive]="true"
+          [property]="descriptionProperty"
+          (valueChange)="createDescription = $event.value"
+          [externalError]="lastError"
+        ></app-field-editor>
+        <app-field-editor
+          [isActive]="true"
+          [property]="tokenProperty"
+          (valueChange)="createToken = $event.value"
+        ></app-field-editor>
+        <button
+          type="submit"
+          nbButton
+          ghost
+          [disabled]="!createToken || !createDescription"
+        >
+          <nb-icon icon="plus" aria-label="add"></nb-icon> Add Token
+        </button>
+      </form>
+    </nb-card-body>
+  </nb-card>
+</ng-template>

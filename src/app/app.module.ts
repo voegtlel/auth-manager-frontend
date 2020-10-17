@@ -73,6 +73,7 @@ import { MemberGroupsAccessComponent } from './_components/member-groups-access/
 import { MemberUsersAccessComponent } from './_components/member-users-access/member-users-access.component';
 import { MemberGroupsOptionsComponent } from './_components/member-groups-options/member-groups-options.component';
 import { StringListEditComponent } from './_components/string-list-edit/string-list-edit.component';
+import { AccessTokensComponent } from './_components/access-tokens/access-tokens.component';
 
 @NgModule({
   declarations: [
@@ -99,6 +100,7 @@ import { StringListEditComponent } from './_components/string-list-edit/string-l
     ClientsComponent,
     ClientComponent,
     StringListEditComponent,
+    AccessTokensComponent,
   ],
   imports: [
     BrowserModule,

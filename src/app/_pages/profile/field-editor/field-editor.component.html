@@ -93,6 +93,18 @@
       {{ externalErrorMessage }}
     </div>
   </div>
+  <ng-container *ngSwitchCase="'access_token'">
+    <app-access-tokens
+      [accessTokens]="property.value"
+      (accessTokensChange)="
+        property.value = $event;
+        valueChange.emit({ property: property, value: $event })
+      "
+      [isAdmin]="isAdmin"
+      [isSelf]="isSelf"
+      [readOnly]="!canEdit"
+    ></app-access-tokens>
+  </ng-container>
   <div *ngSwitchCase="'int'" class="form-control-group">
     <label class="label" [for]="formControlEl">{{ property.title }}</label>
     <input
