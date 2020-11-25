@@ -35,7 +35,7 @@ interface AccessTokenTableEntry extends TableEntry {
   styleUrls: ['./access-tokens.component.scss'],
 })
 export class AccessTokensComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() accessTokens: UserPasswordAccessToken[];
+  @Input() accessTokens: UserPasswordAccessToken[] = [];
   @Output() accessTokensChange = new EventEmitter<UserPasswordAccessToken[]>();
   @Input() readOnly = false;
   @Input() isAdmin: boolean;
@@ -107,7 +107,7 @@ export class AccessTokensComponent implements OnInit, OnDestroy, OnChanges {
   constructor(private dialogService: NbDialogService) {
     this.accessTokensData$ = this.accessTokens$.pipe(
       map((accessTokens) =>
-        accessTokens.map((accessToken, index) => ({
+        (accessTokens ?? []).map((accessToken, index) => ({
           data: { ...accessToken, index },
         }))
       )
@@ -123,6 +123,9 @@ export class AccessTokensComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.accessTokens) {
+      if (this.accessTokens == null) {
+        this.accessTokens = [];
+      }
       this.accessTokens$.next(changes.accessTokens.currentValue);
     }
     if (changes.readOnly) {

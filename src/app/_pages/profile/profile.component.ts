@@ -85,6 +85,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         (profileData) => {
           this.loading = false;
           this.profileData = profileData;
+          console.log('Loaded Profile:', profileData);
           this.propertiesByKey = profileData.properties.reduce(
             (o, property) => {
               o[property.key] = property;

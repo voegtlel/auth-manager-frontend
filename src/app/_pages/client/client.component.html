@@ -1,8 +1,6 @@
 <nb-card>
   <nb-card-header>
-    <ng-container>
-      Client
-    </ng-container>
+    <ng-container> Client </ng-container>
   </nb-card-header>
   <nb-card-body [nbSpinner]="loading || saving">
     <form (submit)="submit($event)" [formGroup]="form">
@@ -188,6 +186,7 @@
           <nb-option value="authorization_code">Authorization Code</nb-option>
           <nb-option value="implicit">Implicit</nb-option>
           <nb-option value="refresh_token">Refresh Token</nb-option>
+          <nb-option value="password">Password (Dangerous!)</nb-option>
         </nb-select>
         <div
           *ngIf="form.get('grant_type').hasError('required')"
@@ -237,9 +236,7 @@
   <nb-card>
     <nb-card-header>Delete Client?</nb-card-header>
     <nb-card-body>
-      <p>
-        Do you really want to delete the client? This cannot be undone!
-      </p>
+      <p>Do you really want to delete the client? This cannot be undone!</p>
     </nb-card-body>
     <nb-card-footer>
       <button

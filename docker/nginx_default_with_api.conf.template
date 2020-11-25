@@ -27,10 +27,6 @@ server {
         proxy_pass http://api/api/v1/manager;
     }
 
-    location /api/v1/mail {
-        proxy_pass http://api/api/v1/mail;
-    }
-
     location /authorize {
         proxy_pass http://api/authorize;
     }
@@ -39,16 +35,12 @@ server {
         proxy_pass http://api/token;
     }
 
-    location /token/revoke {
-        proxy_pass http://api/token/revoke;
+    location /token {
+        proxy_pass http://api/token;
     }
 
     location /userinfo {
         proxy_pass http://api/userinfo;
-    }
-
-    location /picture {
-        proxy_pass http://api/picture;
     }
 
     location /login-status-iframe.html {
@@ -65,5 +57,17 @@ server {
 
     location /.well-known/openid-configuration {
         proxy_pass http://api/.well-known/openid-configuration;
+    }
+
+    location /picture {
+        proxy_pass http://api/picture;
+    }
+
+    location /profiles {
+        proxy_pass http://api/profiles;
+    }
+
+    location /mail {
+        proxy_pass http://api/mail;
     }
 }
