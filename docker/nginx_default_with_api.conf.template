@@ -35,10 +35,6 @@ server {
         proxy_pass http://api/token;
     }
 
-    location /token {
-        proxy_pass http://api/token;
-    }
-
     location /userinfo {
         proxy_pass http://api/userinfo;
     }
