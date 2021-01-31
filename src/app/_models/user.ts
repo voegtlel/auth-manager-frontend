@@ -1,44 +1,5 @@
-export interface EnumValue {
-  value: string;
-  title: string;
-}
-
-export type PermissionType =
-  | 'everybody'
-  | 'self'
-  | 'only_self'
-  | 'admin'
-  | 'nobody';
-
-export type PropertyType =
-  | 'str'
-  | 'multistr'
-  | 'token'
-  | 'int'
-  | 'datetime'
-  | 'date'
-  | 'bool'
-  | 'enum'
-  | 'picture'
-  | 'email'
-  | 'password'
-  | 'groups'
-  | 'access_token';
-
-export interface UserProperty {
-  type: PropertyType;
-  format: string;
-  format_help: string;
-  can_edit: PermissionType;
-  can_read: PermissionType;
-  write_once: boolean;
-  default: any;
-  visible: PermissionType;
-  title: string;
-  values: EnumValue[];
-  template: string;
-  required: boolean;
-}
+import { UserProperty } from './schema';
+import { UserGroupPropertyType } from './user_view';
 
 export interface UserPasswordAccessToken {
   id?: string;
@@ -46,17 +7,19 @@ export interface UserPasswordAccessToken {
   token?: string;
 }
 
-export interface UserPropertyWithKey extends UserProperty {
-  key: string;
+export interface UserPropertyWithValue extends UserProperty {
+  value: any;
 }
 
-export interface UserPropertyWithValue extends UserPropertyWithKey {
-  value: any;
+export interface UserViewDataGroup {
+  title: string;
+  type: UserGroupPropertyType;
+  properties: UserPropertyWithValue[];
 }
 
 export interface UserViewData {
   user_id: string;
-  properties?: UserPropertyWithValue[];
+  view_groups: UserViewDataGroup[];
 }
 
 export interface UserListProperty {
@@ -70,6 +33,16 @@ export interface UserListViewData {
 }
 
 export interface UsersListViewData {
-  properties: UserPropertyWithKey[];
+  view_id: string;
+  view_name: string;
+  properties: UserProperty[];
   users: UserListViewData[];
+}
+
+export interface PasswordReset {
+  email: string;
+}
+
+export interface PasswordInWrite {
+  password: string;
 }

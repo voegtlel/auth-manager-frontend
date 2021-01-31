@@ -1,37 +1,54 @@
 <nb-card>
   <nb-card-header>
-    <ng-container *ngIf="registrationToken">
-      Register
-    </ng-container>
+    <ng-container *ngIf="registrationToken">Register</ng-container>
     <ng-container *ngIf="!registrationToken && isNew">
       Create User
     </ng-container>
-    <ng-container *ngIf="!registrationToken && !isNew">
-      Profile
-    </ng-container>
+    <ng-container *ngIf="!registrationToken && !isNew">Profile</ng-container>
   </nb-card-header>
   <nb-card-body [nbSpinner]="loading || saving">
     <form (submit)="submit($event)">
-      <ng-container *ngFor="let property of profileData?.properties">
-        <app-field-editor
-          *ngIf="
-            (property.visible === 'everybody' ||
-              (property.visible === 'self' && (isSelf || isAdmin)) ||
-              (property.visible === 'admin' && isAdmin)) &&
-            (!property.template || (!isNew && !registrationToken))
-          "
-          [userId]="profileData.user_id"
-          [registrationToken]="registrationToken"
-          [property]="property"
-          [propertiesByKey]="propertiesByKey"
-          [isActive]="activeProperty?.value"
-          (valueChange)="onValueChange($event.property.key, $event.value)"
-          (validChange)="onValidChange($event.property.key, $event.valid)"
-        ></app-field-editor>
+      <ng-container *ngFor="let group of profileData?.view_groups">
+        <h2>{{ group.title }}</h2>
+        <ng-container [ngSwitch]="group.type">
+          <ng-container *ngSwitchCase="'default'">
+            <ng-container *ngFor="let property of group.properties">
+              <app-field-editor
+                *ngIf="
+                  (property.visible === 'everybody' ||
+                    (property.visible === 'self' && (isSelf || isAdmin)) ||
+                    (property.visible === 'admin' && isAdmin)) &&
+                  (!property.template || (!isNew && !registrationToken))
+                "
+                [userId]="profileData.user_id"
+                [registrationToken]="registrationToken"
+                [property]="property"
+                [isActive]="activeProperty?.value"
+                (valueChange)="onValueChange($event.property.key, $event.value)"
+                (validChange)="onValidChange($event.property.key, $event.valid)"
+              ></app-field-editor>
+            </ng-container>
+          </ng-container>
+          <app-set-password
+            *ngSwitchCase="'password'"
+            [userId]="userId"
+            [isActive]="activeProperty?.value"
+          ></app-set-password>
+          <app-set-email
+            *ngSwitchCase="'email'"
+            [emailProperty]="propertiesByKey.email"
+            [emailVerifiedProperty]="propertiesByKey.email_verified"
+            [emailForwardProperty]="propertiesByKey.forward_emails"
+            [hasEmailAliasProperty]="propertiesByKey.has_email_alias"
+            [emailAliasProperty]="propertiesByKey.email_alias"
+            [isActive]="activeProperty?.value"
+            [userId]="userId"
+          ></app-set-email>
+        </ng-container>
+        <div class="spacing">
+          <hr />
+        </div>
       </ng-container>
-      <div class="spacing">
-        <hr />
-      </div>
       <div class="form-control-group">
         <nb-checkbox
           *ngIf="!registrationToken && isNew"

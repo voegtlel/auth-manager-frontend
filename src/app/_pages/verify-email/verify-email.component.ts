@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { map, switchMap, takeUntil, delay, tap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from 'src/app/_services/api.service';
 import { NbToastrService } from '@nebular/theme';
-import { Subject, defer } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
   templateUrl: './verify-email.component.html',

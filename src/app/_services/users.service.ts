@@ -1,13 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { ApiService } from './api.service';
-import { switchMap, shareReplay, map, tap } from 'rxjs/operators';
 import { NbToastrService } from '@nebular/theme';
-import {
-  UsersListViewData,
-  UserListViewData,
-  UserPropertyWithKey,
-} from '../_models/user';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { UserProperty } from '../_models/schema';
+import { UserListViewData, UsersListViewData } from '../_models/user';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +15,7 @@ export class UsersService {
   private _hot = false;
   public readonly _userListViewData$: Observable<UsersListViewData>;
   public readonly _users$: Observable<UserListViewData[]>;
-  public readonly _properties$: Observable<UserPropertyWithKey[]>;
+  public readonly _properties$: Observable<UserProperty[]>;
   public readonly _usersById$: Observable<Record<string, UserListViewData>>;
 
   public get userListViewData$(): Observable<UsersListViewData> {
@@ -30,7 +27,7 @@ export class UsersService {
     this._makeHot();
     return this._users$;
   }
-  public get properties$(): Observable<UserPropertyWithKey[]> {
+  public get properties$(): Observable<UserProperty[]> {
     this._makeHot();
     return this._properties$;
   }
@@ -42,7 +39,7 @@ export class UsersService {
   constructor(apiService: ApiService, private toastr: NbToastrService) {
     this._userListViewData$ = this._reload$.pipe(
       tap(() => (this._reloading = true)),
-      switchMap(() => apiService.getUsers()),
+      switchMap(() => apiService.getUsers('all')),
       tap(() => (this._reloading = false)),
       shareReplay(1)
     );

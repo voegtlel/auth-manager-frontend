@@ -1,0 +1,60 @@
+<nb-card>
+  <nb-card-header>Schema</nb-card-header>
+  <nb-card-body [nbSpinner]="loading || saving">
+    <form *ngIf="form" (submit)="submit($event)" [formGroup]="form">
+      <nb-accordion>
+        <nb-accordion-item>
+          <nb-accordion-item-header
+            >User Properties
+            <nb-icon
+              icon="question-mark-circle-outline"
+              nbTooltip="Defines all possible properties defined for users."
+            ></nb-icon
+          ></nb-accordion-item-header>
+          <nb-accordion-item-body>
+            <app-schema-user-properties
+              [user_properties]="form.controls.user_properties"
+            ></app-schema-user-properties>
+          </nb-accordion-item-body>
+        </nb-accordion-item>
+        <nb-accordion-item>
+          <nb-accordion-item-header
+            >Scopes
+            <nb-icon
+              icon="question-mark-circle-outline"
+              nbTooltip="Defines the scopes for fetching data using authentication."
+            ></nb-icon
+          ></nb-accordion-item-header>
+          <nb-accordion-item-body>
+            <app-schema-scopes
+              [scopes]="form.controls.scopes"
+              [user_properties]="form.controls.user_properties"
+              [group_types]="form.controls.group_types"
+            ></app-schema-scopes>
+          </nb-accordion-item-body>
+        </nb-accordion-item>
+        <nb-accordion-item>
+          <nb-accordion-item-header
+            >Group Types
+            <nb-icon
+              icon="question-mark-circle-outline"
+              nbTooltip="Defines the types of groups. Different types of groups can be used to be referenced by scopes, to return only this kind of group."
+            ></nb-icon
+          ></nb-accordion-item-header>
+          <nb-accordion-item-body>
+            <app-schema-group-types
+              [group_types]="form.controls.group_types"
+            ></app-schema-group-types>
+          </nb-accordion-item-body>
+        </nb-accordion-item>
+      </nb-accordion>
+
+      <button nbButton type="submit" [disabled]="!form.valid || form.pristine">
+        Save Schema
+      </button>
+      <div *ngIf="lastError" class="error-message">
+        {{ lastError }}
+      </div>
+    </form>
+  </nb-card-body>
+</nb-card>

@@ -26,7 +26,6 @@ import {
   TableColumn,
 } from 'src/app/_components/table/table.component';
 import { UserPropertyWithValue } from 'src/app/_models/user';
-import { AuthService } from 'src/app/_services/auth.service';
 
 interface AccessGroupEntry extends GroupInList {
   index: number;

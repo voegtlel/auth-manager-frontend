@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
-import { ApiService } from 'src/app/_services/api.service';
 import { takeUntil } from 'rxjs/operators';
 import { NbToastrService } from '@nebular/theme';
 import {

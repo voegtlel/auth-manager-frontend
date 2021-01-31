@@ -74,6 +74,10 @@ import { MemberUsersAccessComponent } from './_components/member-users-access/me
 import { MemberGroupsOptionsComponent } from './_components/member-groups-options/member-groups-options.component';
 import { StringListEditComponent } from './_components/string-list-edit/string-list-edit.component';
 import { AccessTokensComponent } from './_components/access-tokens/access-tokens.component';
+import { SchemaComponent } from './_pages/schema/schema.component';
+import { SchemaUserPropertiesComponent } from './_pages/schema/schema-user-properties/schema-user-properties.component';
+import { SchemaScopesComponent } from './_pages/schema/schema-scopes/schema-scopes.component';
+import { SchemaGroupTypesComponent } from './_pages/schema/schema-group-types/schema-group-types.component';
 
 @NgModule({
   declarations: [
@@ -101,6 +105,10 @@ import { AccessTokensComponent } from './_components/access-tokens/access-tokens
     ClientComponent,
     StringListEditComponent,
     AccessTokensComponent,
+    SchemaComponent,
+    SchemaUserPropertiesComponent,
+    SchemaScopesComponent,
+    SchemaGroupTypesComponent,
   ],
   imports: [
     BrowserModule,

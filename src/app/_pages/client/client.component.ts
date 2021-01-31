@@ -15,7 +15,6 @@ import { AuthService } from 'src/app/_services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NbToastrService, NbDialogRef, NbDialogService } from '@nebular/theme';
 import { Client } from 'src/app/_models/client';
-import { OAuthService, OAuthSuccessEvent } from 'angular-oauth2-oidc';
 
 const requiredGrantMap: Record<string, string[]> = {
   code: ['authorization_code'],

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { UserPropertyWithValue } from 'src/app/_models/user';
 import { ApiService } from 'src/app/_services/api.service';
 import { NbToastrService } from '@nebular/theme';

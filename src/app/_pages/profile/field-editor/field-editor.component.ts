@@ -8,7 +8,8 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { UserPropertyWithValue, PropertyType } from 'src/app/_models/user';
+import { UserPropertyWithValue } from 'src/app/_models/user';
+import { PropertyType } from 'src/app/_models/schema';
 import { AuthService } from 'src/app/_services/auth.service';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil, map } from 'rxjs/operators';
@@ -24,7 +25,6 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
   @Input() userId: string;
   @Input() registrationToken: string;
   @Input() property: UserPropertyWithValue;
-  @Input() propertiesByKey: Record<string, UserPropertyWithValue>;
   @Input() isActive: boolean;
   @Input() overrideType:
     | 'str'

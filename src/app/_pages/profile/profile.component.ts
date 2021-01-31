@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
-import { ApiService } from 'src/app/_services/api.service';
-import { takeUntil, filter, switchMap, map } from 'rxjs/operators';
-import { Subject, of, combineLatest } from 'rxjs';
-import { UserViewData, UserPropertyWithValue } from 'src/app/_models/user';
-import { AuthService } from 'src/app/_services/auth.service';
+import { Component, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NbToastrService, NbDialogService, NbDialogRef } from '@nebular/theme';
+import { NbDialogRef, NbDialogService, NbToastrService } from '@nebular/theme';
+import { combineLatest, of, Subject } from 'rxjs';
+import { filter, map, switchMap, takeUntil } from 'rxjs/operators';
+import { UserPropertyWithValue, UserViewData } from 'src/app/_models/user';
+import { ApiService } from 'src/app/_services/api.service';
+import { AuthService } from 'src/app/_services/auth.service';
 import { UsersService } from 'src/app/_services/users.service';
 
 @Component({
@@ -86,9 +86,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.loading = false;
           this.profileData = profileData;
           console.log('Loaded Profile:', profileData);
-          this.propertiesByKey = profileData.properties.reduce(
-            (o, property) => {
-              o[property.key] = property;
+          this.propertiesByKey = profileData.view_groups.reduce(
+            (o, propertyGroup) => {
+              for (const prop of propertyGroup.properties) {
+                o[prop.key] = prop;
+              }
               return o;
             },
             {}
@@ -96,7 +98,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.activeProperty = this.propertiesByKey.active;
         },
         (err) => {
-          this.loading = false;
           this.loading = false;
           if (err?.status === 0) {
             this.toastr.danger(err?.statusText, 'Error');

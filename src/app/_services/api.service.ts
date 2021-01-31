@@ -4,8 +4,10 @@ import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { UserViewData, UsersListViewData } from '../_models/user';
 import { EnvService } from './env.service';
-import { Group, GroupWithId, GroupInList } from '../_models/user_group';
+import { GroupInList } from '../_models/user_group';
 import { Client, ClientInList } from '../_models/client';
+import { GroupInCreate, GroupInRead, GroupInWrite } from '../_models/group';
+import { ManagerSchema } from '../_models/schema';
 
 @Injectable({
   providedIn: 'root',
@@ -29,8 +31,10 @@ export class ApiService {
     });
   }
 
-  getUsers(): Observable<UsersListViewData> {
-    return this.http.get<UsersListViewData>(`${this.env.apiUrl}/users`);
+  getUsers(viewId: string): Observable<UsersListViewData> {
+    return this.http.get<UsersListViewData>(
+      `${this.env.apiUrl}/users/list/${viewId}`
+    );
   }
 
   getCreateUser(): Observable<UserViewData> {
@@ -114,7 +118,15 @@ export class ApiService {
     );
   }
 
-  createGroup(data: GroupWithId): Observable<void> {
+  getSchema(): Observable<ManagerSchema> {
+    return this.http.get<ManagerSchema>(`${this.env.apiUrl}/schema`);
+  }
+
+  updateSchema(data: ManagerSchema): Observable<void> {
+    return this.http.put<void>(`${this.env.apiUrl}/schema`, data);
+  }
+
+  createGroup(data: GroupInCreate): Observable<void> {
     return this.http.post<void>(`${this.env.apiUrl}/groups`, data);
   }
 
@@ -122,11 +134,11 @@ export class ApiService {
     return this.http.get<GroupInList[]>(`${this.env.apiUrl}/groups`);
   }
 
-  getGroup(groupId: string): Observable<GroupWithId> {
-    return this.http.get<GroupWithId>(`${this.env.apiUrl}/groups/${groupId}`);
+  getGroup(groupId: string): Observable<GroupInRead> {
+    return this.http.get<GroupInRead>(`${this.env.apiUrl}/groups/${groupId}`);
   }
 
-  updateGroup(groupId: string, data: Group): Observable<void> {
+  updateGroup(groupId: string, data: GroupInWrite): Observable<void> {
     return this.http.put<void>(`${this.env.apiUrl}/groups/${groupId}`, data);
   }
 

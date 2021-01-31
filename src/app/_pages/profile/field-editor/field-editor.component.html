@@ -217,42 +217,31 @@
     </div>
   </div>
   <ng-container *ngSwitchCase="'password'">
-    <ng-container *ngIf="isNew || registering; else passwordEdit">
-      <div class="form-control-group">
-        <label class="label" [for]="formControlEl">{{ property.title }}</label>
-        <input
-          type="password"
-          nbInput
-          fullWidth
-          fieldSize="medium"
-          [placeholder]="property.title"
-          [name]="property.key"
-          [(ngModel)]="property.value"
-          (ngModelChange)="onChange()"
-          [readOnly]="!canEdit"
-          [status]="
-            externalError || !formatMatch || !requiredMatch ? 'danger' : 'basic'
-          "
-          #formControlEl
-        />
-        <div *ngIf="!requiredMatch" class="error-message">Required.</div>
-        <div *ngIf="!formatMatch && requiredMatch" class="error-message">
-          Invalid format, must match {{ property.format_help }}.
-        </div>
-        <div *ngIf="externalError" class="error-message">
-          {{ externalErrorMessage }}
-        </div>
+    <div class="form-control-group">
+      <label class="label" [for]="formControlEl">{{ property.title }}</label>
+      <input
+        type="password"
+        nbInput
+        fullWidth
+        fieldSize="medium"
+        [placeholder]="property.title"
+        [name]="property.key"
+        [(ngModel)]="property.value"
+        (ngModelChange)="onChange()"
+        [readOnly]="!canEdit"
+        [status]="
+          externalError || !formatMatch || !requiredMatch ? 'danger' : 'basic'
+        "
+        #formControlEl
+      />
+      <div *ngIf="!requiredMatch" class="error-message">Required.</div>
+      <div *ngIf="!formatMatch && requiredMatch" class="error-message">
+        Invalid format, must match {{ property.format_help }}.
       </div>
-    </ng-container>
-    <ng-template #passwordEdit>
-      <app-set-password
-        [userId]="userId"
-        [isActive]="isActive"
-      ></app-set-password>
-      <div class="spacing">
-        <hr />
+      <div *ngIf="externalError" class="error-message">
+        {{ externalErrorMessage }}
       </div>
-    </ng-template>
+    </div>
   </ng-container>
   <ng-container *ngSwitchCase="'picture'">
     <ng-container *ngIf="!isNew">
@@ -268,41 +257,14 @@
     </ng-container>
   </ng-container>
   <ng-container *ngSwitchCase="'email'">
-    <ng-container *ngIf="isNew || registering; else emailEdit">
-      <app-field-editor
-        [property]="property"
-        overrideType="str"
-        [isActive]="isActive"
-        (valueChange)="valueChange.emit($event)"
-        (validChange)="validChange.emit($event)"
-        [externalError]="externalError"
-      ></app-field-editor>
-      <app-field-editor
-        *ngIf="propertiesByKey.email_verified"
-        [property]="propertiesByKey.email_verified"
-        [isActive]="isActive"
-        (valueChange)="valueChange.emit($event)"
-        (validChange)="validChange.emit($event)"
-        [externalError]="externalError"
-      ></app-field-editor>
-      <div class="spacing">
-        <hr />
-      </div>
-    </ng-container>
-    <ng-template #emailEdit>
-      <app-set-email
-        [emailProperty]="property"
-        [emailVerifiedProperty]="propertiesByKey.email_verified"
-        [emailForwardProperty]="propertiesByKey.forward_emails"
-        [hasEmailAliasProperty]="propertiesByKey.has_email_alias"
-        [emailAliasProperty]="propertiesByKey.email_alias"
-        [isActive]="isActive"
-        [userId]="userId"
-      ></app-set-email>
-      <div class="spacing">
-        <hr />
-      </div>
-    </ng-template>
+    <app-field-editor
+      [property]="property"
+      overrideType="str"
+      [isActive]="isActive"
+      (valueChange)="valueChange.emit($event)"
+      (validChange)="validChange.emit($event)"
+      [externalError]="externalError"
+    ></app-field-editor>
   </ng-container>
   <ng-container *ngSwitchCase="'groups'">
     <app-member-groups-options

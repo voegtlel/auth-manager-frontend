@@ -1,0 +1,77 @@
+<nb-accordion multi>
+  <nb-accordion-item
+    *ngFor="let groupType of group_types.controls; let scopeIndex = index"
+  >
+    <nb-accordion-item-header>{{
+      groupType.controls.key.value
+    }}</nb-accordion-item-header>
+    <nb-accordion-item-body>
+      <div class="form-control-group">
+        <label class="label" [for]="key_el"
+          >Key
+          <nb-icon
+            icon="question-mark-circle-outline"
+            nbTooltip="Key of the group as referenced internally. Recommendation: Do not change this."
+          ></nb-icon>
+        </label>
+        <input
+          type="text"
+          nbInput
+          fullWidth
+          placeholder="Key"
+          [formControl]="groupType.controls.key"
+          [status]="groupType.controls.key.valid ? 'basic' : 'danger'"
+          #key_el
+        />
+        <div
+          *ngIf="groupType.controls.key.hasError('required')"
+          class="error-message"
+        >
+          Required.
+        </div>
+      </div>
+
+      <div class="form-control-group">
+        <label class="label" [for]="title_el"
+          >Title
+          <nb-icon
+            icon="question-mark-circle-outline"
+            nbTooltip="Displayed title when viewing/editing the group."
+          ></nb-icon>
+        </label>
+        <input
+          type="text"
+          nbInput
+          fullWidth
+          placeholder="Title"
+          [formControl]="groupType.controls.title"
+          [status]="groupType.controls.title.valid ? 'basic' : 'danger'"
+          #title_el
+        />
+        <div
+          *ngIf="groupType.controls.title.hasError('required')"
+          class="error-message"
+        >
+          Required.
+        </div>
+      </div>
+
+      <button
+        nbButton
+        type="button"
+        [disabled]="groupType.disabled"
+        (click)="group_types.removeAt(scopeIndex); group_types.markAsDirty()"
+      >
+        Remove Group Type {{ groupType.controls.key.value }}
+      </button>
+    </nb-accordion-item-body>
+  </nb-accordion-item>
+</nb-accordion>
+<button
+  nbButton
+  type="button"
+  [disabled]="group_types.disabled"
+  (click)="group_types.push(); group_types.markAsDirty()"
+>
+  Add Group Type
+</button>

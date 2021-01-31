@@ -12,6 +12,7 @@ import { GroupsComponent } from './_pages/groups/groups.component';
 import { GroupComponent } from './_pages/group/group.component';
 import { ClientsComponent } from './_pages/clients/clients.component';
 import { ClientComponent } from './_pages/client/client.component';
+import { SchemaComponent } from './_pages/schema/schema.component';
 
 const routes: Routes = [
   {
@@ -70,6 +71,16 @@ const routes: Routes = [
       {
         path: ':clientId',
         component: ClientComponent,
+      },
+    ],
+  },
+  {
+    path: 'schema',
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: '',
+        component: SchemaComponent,
       },
     ],
   },
