@@ -4,10 +4,15 @@ import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { UserViewData, UsersListViewData } from '../_models/user';
 import { EnvService } from './env.service';
-import { GroupInList } from '../_models/user_group';
+import { GroupInList } from '../_models/group';
 import { Client, ClientInList } from '../_models/client';
 import { GroupInCreate, GroupInRead, GroupInWrite } from '../_models/group';
 import { ManagerSchema } from '../_models/schema';
+import {
+  UserViewInList,
+  UserViewInRead,
+  UserViewInWrite,
+} from '../_models/user_view';
 
 @Injectable({
   providedIn: 'root',
@@ -124,6 +129,35 @@ export class ApiService {
 
   updateSchema(data: ManagerSchema): Observable<void> {
     return this.http.put<void>(`${this.env.apiUrl}/schema`, data);
+  }
+
+  getUserViews(): Observable<UserViewInList[]> {
+    return this.http.get<UserViewInList[]>(`${this.env.apiUrl}/schema/views`);
+  }
+
+  getUserView(userViewId: string): Observable<UserViewInRead> {
+    return this.http.get<UserViewInRead>(
+      `${this.env.apiUrl}/schema/views/${userViewId}`
+    );
+  }
+
+  getUserViewByGroup(groupId: string): Observable<UserViewInRead> {
+    return this.http.get<UserViewInRead>(
+      `${this.env.apiUrl}/groups/${groupId}/views`
+    );
+  }
+
+  updateUserView(userViewId: string, data: UserViewInWrite): Observable<void> {
+    return this.http.put<void>(
+      `${this.env.apiUrl}/schema/views/${userViewId}`,
+      data
+    );
+  }
+
+  deleteUserView(userViewId: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.env.apiUrl}/schema/views/${userViewId}`
+    );
   }
 
   createGroup(data: GroupInCreate): Observable<void> {

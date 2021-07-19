@@ -67,6 +67,12 @@ export class AppComponent implements OnDestroy {
       icon: 'bulb',
     },
     {
+      title: 'Schema',
+      link: '/schema',
+      pathMatch: 'prefix',
+      icon: 'code-outline',
+    },
+    {
       title: 'Log Out',
       link: '/logout',
       icon: 'log-out',

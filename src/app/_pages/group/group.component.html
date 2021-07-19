@@ -1,8 +1,6 @@
 <nb-card>
   <nb-card-header>
-    <ng-container>
-      Group
-    </ng-container>
+    <ng-container> Group </ng-container>
   </nb-card-header>
   <nb-card-body [nbSpinner]="loading || saving">
     <form (submit)="submit($event)" [formGroup]="form">
@@ -13,22 +11,54 @@
           nbInput
           fullWidth
           placeholder="Group ID"
-          formControlName="id"
-          [status]="form.get('id').valid ? 'basic' : 'danger'"
+          [formControl]="form.controls.id"
+          [status]="form.controls.id.valid ? 'basic' : 'danger'"
           #group_id_el
         />
-        <div *ngIf="form.get('id').hasError('required')" class="error-message">
+        <div
+          *ngIf="form.controls.id.hasError('required')"
+          class="error-message"
+        >
           Required.
         </div>
-        <div *ngIf="form.get('id').hasError('pattern')" class="error-message">
+        <div *ngIf="form.controls.id.hasError('pattern')" class="error-message">
           Contains invalid characters, allowed characters: 'a'-'z', 'A'-'Z',
           '0'-'9', '_', '.', '+', '-'.
         </div>
         <div
-          *ngIf="form.get('id').hasError('groupExists')"
+          *ngIf="form.controls.id.hasError('groupExists')"
           class="error-message"
         >
           A group with this ID already exists.
+        </div>
+      </div>
+
+      <div class="form-control-group">
+        <label class="label" [for]="type_el"
+          >Group Type
+          <nb-icon
+            icon="question-mark-circle-outline"
+            nbTooltip="Type of the group."
+          ></nb-icon>
+        </label>
+        <nb-select
+          fullWidth
+          placeholder="Group Type"
+          [formControl]="form.controls.group_type"
+          [status]="form.controls.group_type.valid ? 'basic' : 'danger'"
+          #type_el
+        >
+          <nb-option
+            [value]="group.key"
+            *ngFor="let group of groups$ | async"
+            >{{ group.title }}</nb-option
+          >
+        </nb-select>
+        <div
+          *ngIf="form.controls.group_type.hasError('required')"
+          class="error-message"
+        >
+          Required.
         </div>
       </div>
 
@@ -39,12 +69,12 @@
           nbInput
           fullWidth
           placeholder="Group Name"
-          formControlName="group_name"
-          [status]="form.get('group_name').valid ? 'basic' : 'danger'"
+          [formControl]="form.controls.group_name"
+          [status]="form.controls.group_name.valid ? 'basic' : 'danger'"
           #group_name_el
         />
         <div
-          *ngIf="form.get('group_name').hasError('required')"
+          *ngIf="form.controls.group_name.hasError('required')"
           class="error-message"
         >
           Required.
@@ -58,12 +88,12 @@
           nbInput
           fullWidth
           placeholder="Notes"
-          formControlName="notes"
-          [status]="form.get('notes').valid ? 'basic' : 'danger'"
+          [formControl]="form.controls.notes"
+          [status]="form.controls.notes.valid ? 'basic' : 'danger'"
           #group_notes_el
         ></textarea>
         <div
-          *ngIf="form.get('notes').hasError('required')"
+          *ngIf="form.controls.notes.hasError('required')"
           class="error-message"
         >
           Required.
@@ -73,12 +103,12 @@
       <div class="form-control-group">
         <nb-checkbox
           fullWidth
-          formControlName="visible"
-          [status]="form.get('visible').valid ? 'basic' : 'danger'"
+          [formControl]="form.controls.visible"
+          [status]="form.controls.visible.valid ? 'basic' : 'danger'"
           >Visible</nb-checkbox
         >
         <div
-          *ngIf="form.get('visible').hasError('required')"
+          *ngIf="form.controls.visible.hasError('required')"
           class="error-message"
         >
           Required.
@@ -86,13 +116,13 @@
       </div>
 
       <div class="form-control-group">
-        <nb-checkbox fullWidth formControlName="enable_email"
+        <nb-checkbox fullWidth [formControl]="form.controls.enable_email"
           >Enable E-Mail Address</nb-checkbox
         >
       </div>
 
       <div class="form-control-group">
-        <nb-checkbox fullWidth formControlName="enable_postbox"
+        <nb-checkbox fullWidth [formControl]="form.controls.enable_postbox"
           >Enable Postbox</nb-checkbox
         >
       </div>
@@ -104,26 +134,55 @@
           nbInput
           fullWidth
           placeholder="Postbox Quota"
-          formControlName="postbox_quota"
-          [status]="form.get('postbox_quota').valid ? 'basic' : 'danger'"
+          [formControl]="form.controls.postbox_quota"
+          [status]="form.controls.postbox_quota.valid ? 'basic' : 'danger'"
           #postbox_quota_el
         />
         <div
-          *ngIf="form.get('postbox_quota').hasError('required')"
+          *ngIf="form.controls.postbox_quota.hasError('required')"
           class="error-message"
         >
           Required.
         </div>
       </div>
 
+      <div class="form-control-group">
+        <nb-checkbox
+          fullWidth
+          [formControl]="form.controls.email_managed_mailing_list"
+          >Enable managed mailing list</nb-checkbox
+        >
+      </div>
+
+      <div class="form-control-group">
+        <nb-checkbox
+          fullWidth
+          [formControl]="
+            form.controls.email_managed_mailing_list_forward_to_notifiers
+          "
+          >Forward original to notifiers</nb-checkbox
+        >
+      </div>
+
+      <div class="form-control-group">
+        <nb-checkbox
+          fullWidth
+          [formControl]="
+            form.controls.email_managed_mailing_list_send_notification_to_sender
+          "
+          >Send notification to sender</nb-checkbox
+        >
+      </div>
+
       <app-member-groups
-        formControlName="member_groups"
+        [membersFormArray]="form.controls.member_groups"
         [excludeGroups]="[groupId]"
       ></app-member-groups>
       <app-member-users-access
-        formControlName="user_access"
-        [enabledForwarding]="form.get('enable_email').value"
-        [enabledPostbox]="form.get('enable_postbox').value"
+        [accessFormArray]="form.controls.user_access"
+        [enabledForwarding]="form.controls.enable_email.value"
+        [enabledPostbox]="form.controls.enable_postbox.value"
+        [enabledMailingList]="form.controls.email_managed_mailing_list.value"
       ></app-member-users-access>
 
       <button nbButton type="submit" [disabled]="!form.valid || form.pristine">
@@ -155,9 +214,7 @@
   <nb-card>
     <nb-card-header>Delete Group?</nb-card-header>
     <nb-card-body>
-      <p>
-        Do you really want to delete the group? This cannot be undone!
-      </p>
+      <p>Do you really want to delete the group? This cannot be undone!</p>
     </nb-card-body>
     <nb-card-footer>
       <button nbButton type="button" status="danger" (click)="deleteGroup(ref)">

@@ -1,63 +1,44 @@
-<nb-card [nbSpinner]="loading">
-  <nb-card-header>
-    <span>Users / Access</span>
-    <nb-actions>
-      <nb-action icon="plus" (click)="onAddUserDialog(addUserDialog)"
-        >Add</nb-action
-      >
-    </nb-actions>
-  </nb-card-header>
-  <nb-card-body>
-    <app-table
-      [columns]="columnsEdit$ | async"
-      [data]="usersData$ | async"
-    ></app-table>
-  </nb-card-body>
-</nb-card>
-
-<ng-template #addUserDialog let-ref="dialogRef">
-  <nb-card [nbSpinner]="!(allUsersData$ | async)">
-    <nb-card-header>
-      <span>Add User</span>
-    </nb-card-header>
-    <nb-card-body>
-      <app-table
-        [columns]="columnsView$ | async"
-        [data]="allUsersData$ | async"
-        (clickItem)="ref.close(); addUserClick($event.data)"
-      ></app-table>
-    </nb-card-body>
-  </nb-card>
-</ng-template>
+<app-table-form-array-edit
+  title="Users / Access"
+  addTitle="Add User"
+  [data]="accessFormArray"
+  [allData]="allUsersData$ | async"
+  [columnsView]="columnsView$ | async"
+  [columnsEdit]="columnsEdit$ | async"
+  [columnsAdd]="columnsAdd$ | async"
+  [idControl]="idControl"
+  [idAllData]="idAllData"
+  (addEntry)="addUser($event)"
+></app-table-form-array-edit>
 
 <ng-template #emailAllowedForwardCheckbox let-column="column" let-row="row">
   <nb-checkbox
     fieldSize="medium"
-    [(ngModel)]="row.data[column.key]"
-    (ngModelChange)="updateInput(row, column, $event)"
+    [formControl]="row.data.controls[column.key]"
     (click)="$event.stopPropagation()"
-    [disabled]="readOnly || !enabledForwarding"
   ></nb-checkbox>
 </ng-template>
 
 <ng-template #emailForwardCheckbox let-column="column" let-row="row">
   <nb-checkbox
     fieldSize="medium"
-    [(ngModel)]="row.data[column.key]"
-    (ngModelChange)="updateInput(row, column, $event)"
+    [formControl]="row.data.controls[column.key]"
     (click)="$event.stopPropagation()"
-    [disabled]="
-      readOnly || !enabledForwarding || !row.data.access_email_allowed_forward
-    "
   ></nb-checkbox>
 </ng-template>
 
 <ng-template #emailPostboxAccessCheckbox let-column="column" let-row="row">
   <nb-checkbox
     fieldSize="medium"
-    [(ngModel)]="row.data[column.key]"
-    (ngModelChange)="updateInput(row, column, $event)"
+    [formControl]="row.data.controls[column.key]"
     (click)="$event.stopPropagation()"
-    [disabled]="readOnly || !enabledPostbox"
+  ></nb-checkbox>
+</ng-template>
+
+<ng-template #emailMailingListNotifyCheckbox let-column="column" let-row="row">
+  <nb-checkbox
+    fieldSize="medium"
+    [formControl]="row.data.controls[column.key]"
+    (click)="$event.stopPropagation()"
   ></nb-checkbox>
 </ng-template>

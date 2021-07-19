@@ -12,7 +12,7 @@
     </div>
   </div>
 
-  <div class="picture-preview rectangle">
+  <div class="picture-preview rectangle" [class.editable]="canEdit">
     <img *ngIf="pictureUrl" [src]="pictureUrl" />
     <span *ngIf="!pictureUrl">{{ initials }}</span>
     <div
@@ -80,9 +80,7 @@
           >
             Save Picture
           </button>
-          <button nbButton type="button" (click)="closeDialog()">
-            Cancel
-          </button>
+          <button nbButton type="button" (click)="closeDialog()">Cancel</button>
           <button nbButton type="button" (click)="openFileSelector()">
             Open Other File
           </button>

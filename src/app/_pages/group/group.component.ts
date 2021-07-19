@@ -1,31 +1,16 @@
 import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
-import {
-  FormGroup,
-  FormControl,
-  AbstractControl,
-  Validators,
-} from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { GroupsService } from 'src/app/_services/groups.service';
-import { takeUntil, map, switchMap, tap, take } from 'rxjs/operators';
-import { Subject, Observable, of, combineLatest } from 'rxjs';
+import { takeUntil, map, switchMap, take } from 'rxjs/operators';
+import { Subject, Observable, of } from 'rxjs';
 import { ApiService } from 'src/app/_services/api.service';
 import { AuthService } from 'src/app/_services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NbToastrService, NbDialogRef, NbDialogService } from '@nebular/theme';
-import { GroupWithId, Group } from 'src/app/_models/user_group';
-import { GroupUserEmailAccess } from 'src/app/_components/member-users-access/member-users-access.component';
-
-interface EditGroup {
-  id: string;
-  notes: string;
-  group_name: string;
-  visible: boolean;
-  member_groups: string[];
-  enable_email: boolean;
-  enable_postbox: boolean;
-  postbox_quota: number;
-  user_access: GroupUserEmailAccess[];
-}
+import { GroupInRead } from 'src/app/_models/group';
+import { UserGroupForm } from 'src/app/_forms/user-group-form';
+import { SchemaService } from 'src/app/_services/schema.service';
+import { UsersService } from 'src/app/_services/users.service';
 
 @Component({
   templateUrl: './group.component.html',
@@ -33,30 +18,21 @@ interface EditGroup {
 })
 export class GroupComponent implements OnInit, OnDestroy {
   destroyed$ = new Subject<void>();
-  groupData: GroupWithId = null;
+  groupData: GroupInRead = null;
   groupId: string;
 
   lastError: string;
   saving = false;
   loading = true;
 
-  private _groupFormElements: Record<keyof EditGroup, FormControl> = {
-    id: new FormControl(
-      null,
-      [Validators.required, Validators.pattern(/^[a-zA-Z0-9_.+-]+$/)],
-      [(x) => this.validateFormId(x)]
-    ),
-    notes: new FormControl(null),
-    group_name: new FormControl(null, Validators.required),
-    visible: new FormControl(true),
-    member_groups: new FormControl([]),
-    enable_email: new FormControl(false),
-    enable_postbox: new FormControl(false),
-    postbox_quota: new FormControl(100000000),
-    user_access: new FormControl([]),
-  };
+  form = new UserGroupForm(
+    this.usersService.usersById$,
+    this.groupsService.groupsById$,
+    null,
+    [(x) => this.validateFormId(x)]
+  );
 
-  form = new FormGroup(this._groupFormElements);
+  groups$ = this.schemaService.schema$.pipe(map((schema) => schema.groupTypes));
 
   get isNew(): boolean {
     return this.groupId === 'new';
@@ -69,34 +45,14 @@ export class GroupComponent implements OnInit, OnDestroy {
   constructor(
     private api: ApiService,
     private groupsService: GroupsService,
+    private schemaService: SchemaService,
     private authService: AuthService,
+    private usersService: UsersService,
     private route: ActivatedRoute,
     private router: Router,
     private toastr: NbToastrService,
     private dialogService: NbDialogService
-  ) {
-    this._groupFormElements.enable_email.valueChanges.subscribe(
-      (enableEmail) => {
-        if (enableEmail) {
-          this._groupFormElements.enable_postbox.enable();
-          this._groupFormElements.postbox_quota.enable();
-        } else {
-          this._groupFormElements.enable_postbox.disable();
-          this._groupFormElements.postbox_quota.disable();
-        }
-      }
-    );
-    combineLatest([
-      this._groupFormElements.enable_email.valueChanges,
-      this._groupFormElements.enable_postbox.valueChanges,
-    ]).subscribe(([enableEmail, enablePostbox]) => {
-      if (enableEmail && enablePostbox) {
-        this._groupFormElements.postbox_quota.enable();
-      } else {
-        this._groupFormElements.postbox_quota.disable();
-      }
-    });
-  }
+  ) {}
 
   ngOnDestroy() {
     this.destroyed$.next();
@@ -119,43 +75,29 @@ export class GroupComponent implements OnInit, OnDestroy {
         takeUntil(this.destroyed$)
       )
       .subscribe(
-        (groupData: GroupWithId) => {
+        (groupData: GroupInRead) => {
           this.loading = false;
           if (groupData === null) {
-            this.form.reset({
-              id: null,
-              group_name: null,
-              visible: true,
-              notes: null,
-              member_groups: [],
-              enable_email: false,
-              enable_postbox: false,
-              user_access: [],
-            } as EditGroup);
-            this.form.get('id').enable();
+            this.form = new UserGroupForm(
+              this.usersService.usersById$,
+              this.groupsService.groupsById$,
+              null,
+              [(x) => this.validateFormId(x)]
+            );
+            this.form.controls.id.enable();
             this.form.updateValueAndValidity();
           } else {
-            this.form.reset({
-              ...groupData,
-              user_access: groupData.members.map((member) => ({
-                user_id: member,
-                access_email_allowed_forward: groupData.email_allowed_forward_members.includes(
-                  member
-                ),
-                access_email_forward: groupData.email_forward_members.includes(
-                  member
-                ),
-                access_email_postbox_access: groupData.email_postbox_access_members.includes(
-                  member
-                ),
-              })),
-            } as EditGroup);
-            this.form.get('id').disable();
+            this.form = new UserGroupForm(
+              this.usersService.usersById$,
+              this.groupsService.groupsById$,
+              groupData,
+              [(x) => this.validateFormId(x)]
+            );
+            this.form.controls.id.disable();
             this.form.updateValueAndValidity();
           }
         },
         (err) => {
-          this.loading = false;
           this.loading = false;
           if (err?.status === 0) {
             this.toastr.danger(err?.statusText, 'Error');
@@ -183,31 +125,6 @@ export class GroupComponent implements OnInit, OnDestroy {
     );
   }
 
-  getFormValue(includeId: true): GroupWithId;
-  getFormValue(includeId: false): Group;
-  getFormValue(includeId: boolean): GroupWithId | Group {
-    const formValue: EditGroup = this.form.value;
-    const userAccess = formValue.user_access;
-    console.log(userAccess);
-    delete formValue.user_access;
-    if (!includeId) {
-      delete formValue.id;
-    }
-    return {
-      ...formValue,
-      members: userAccess.map((ua) => ua.user_id),
-      email_allowed_forward_members: userAccess
-        .filter((ua) => ua.access_email_allowed_forward)
-        .map((ua) => ua.user_id),
-      email_forward_members: userAccess
-        .filter((ua) => ua.access_email_forward)
-        .map((ua) => ua.user_id),
-      email_postbox_access_members: userAccess
-        .filter((ua) => ua.access_email_postbox_access)
-        .map((ua) => ua.user_id),
-    };
-  }
-
   submit($event) {
     $event.preventDefault();
     $event.stopPropagation();
@@ -217,7 +134,7 @@ export class GroupComponent implements OnInit, OnDestroy {
     this.saving = true;
     if (this.groupId === 'new') {
       this.api
-        .createGroup(this.getFormValue(true))
+        .createGroup(this.form.getRawValue(true))
         .toPromise()
         .then(
           () => {
@@ -242,7 +159,7 @@ export class GroupComponent implements OnInit, OnDestroy {
         );
     } else {
       this.api
-        .updateGroup(this.groupId, this.getFormValue(false))
+        .updateGroup(this.groupId, this.form.getRawValue())
         .toPromise()
         .then(
           () => {

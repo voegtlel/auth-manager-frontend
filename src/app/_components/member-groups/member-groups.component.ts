@@ -1,191 +1,73 @@
-import {
-  Component,
-  Input,
-  OnDestroy,
-  OnChanges,
-  SimpleChanges,
-  TemplateRef,
-  Output,
-  EventEmitter,
-  forwardRef,
-} from '@angular/core';
-import { NbDialogService } from '@nebular/theme';
-import { Subject, Observable, BehaviorSubject, combineLatest } from 'rxjs';
-import { takeUntil, map, filter } from 'rxjs/operators';
-import { GroupInList } from 'src/app/_models/user_group';
+import { Component, Input } from '@angular/core';
+import { map } from 'rxjs/operators';
+import { GroupInList } from 'src/app/_models/group';
 import { GroupsService } from 'src/app/_services/groups.service';
 import {
-  TableEntry,
   TableColumn,
+  ITableEntry,
 } from 'src/app/_components/table/table.component';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  MemberGroupFormControl,
+  MembersFormArray,
+} from 'src/app/_forms/user-group-form';
+
+declare type GroupTableEntry = ITableEntry<MemberGroupFormControl>;
 
 @Component({
   selector: 'app-member-groups',
   templateUrl: './member-groups.component.html',
   styleUrls: ['./member-groups.component.scss'],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => MemberGroupsComponent),
-      multi: true,
-    },
-  ],
 })
-export class MemberGroupsComponent
-  implements OnDestroy, OnChanges, ControlValueAccessor {
-  @Input() groups: string[];
-  @Output() groupsChange = new EventEmitter<string[]>();
-  @Input() readOnly = false;
+export class MemberGroupsComponent {
+  @Input() membersFormArray: MembersFormArray;
   @Input() excludeGroups: string[] = [];
 
-  destroyed$ = new Subject<void>();
-
-  groups$ = new BehaviorSubject<string[]>(null);
-
-  allGroupsData$: Observable<TableEntry[]>;
-
-  groupsData$: Observable<TableEntry[]>;
-
-  columnsView: TableColumn[] = [
-    { key: 'id', title: 'Id', clickableCells: true },
-    { key: 'group_name', title: 'Name', clickableCells: true },
-  ];
-
-  columnsEdit: TableColumn[] = [
+  columnsAdd: TableColumn[] = [
     { key: 'id', title: 'Id' },
-    { key: 'group_name', title: 'Name' },
     {
-      action: (groupEntry: TableEntry) =>
-        this.removeGroup(groupEntry.data as GroupInList),
-      title: '',
-      icon: 'trash',
-      compact: true,
+      key: 'group_name',
+      title: 'Name',
     },
   ];
 
-  loading = true;
-  lastError: string;
-  _onChange: (groups: string[]) => void;
-  _onTouched: () => void;
+  columnsView: TableColumn[] = [
+    { key: 'value', title: 'Id', clickableCells: true },
+    {
+      key: 'group_name',
+      value$: (entry: GroupTableEntry) =>
+        entry.data.group$.pipe(map((group) => group.group_name)),
+      title: 'Name',
+      clickableCells: true,
+    },
+  ];
 
-  constructor(
-    private groupsService: GroupsService,
-    private dialogService: NbDialogService
-  ) {
-    this.groupsService.groups$
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(() => {
-        this.loading = false;
-      });
-    const userGroups$ = combineLatest([
-      this.groups$.pipe(filter((g) => !!g)),
-      this.groupsService.groupsById$,
-    ]).pipe(
-      map(([userGroups, groupsById]) =>
-        userGroups.map(
-          (userGroup) =>
-            groupsById[userGroup] || {
-              id: userGroup,
-              group_name: userGroup,
-              visible: false,
-            }
-        )
-      )
-    );
-    this.groupsData$ = userGroups$.pipe(
-      map((groups) =>
-        groups.map((group) => ({
-          data: group,
-        }))
-      )
-    );
-    this.allGroupsData$ = combineLatest([
-      this.groups$.pipe(filter((g) => !!g)),
-      this.groupsService.groups$.pipe(takeUntil(this.destroyed$)),
-    ]).pipe(
-      map(([userGroups, allGroups]) =>
-        allGroups.filter(
-          (group) =>
-            !userGroups.includes(group.id) &&
-            !this.excludeGroups.includes(group.id)
-        )
-      ),
-      map((groups) => groups.map((group) => ({ data: group })))
-    );
-  }
+  columnsEdit: TableColumn[] = this.columnsView.concat({
+    action: (groupEntry: GroupTableEntry) =>
+      this.removeGroup(groupEntry.data as MemberGroupFormControl),
+    title: '',
+    icon: 'trash',
+    compact: true,
+  });
 
-  ngOnDestroy(): void {
-    this.destroyed$.next();
-    this.destroyed$.complete();
-  }
+  allGroupsData$ = this.groupsService.groups$;
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.groups) {
-      this.groups$.next(changes.groups.currentValue);
-    }
-    if (changes.readOnly) {
-      if (changes.readOnly.currentValue) {
-        this.columnsEdit = this.columnsView;
-      } else {
-        this.columnsEdit = this.columnsView.concat({
-          action: (groupEntry: TableEntry) =>
-            this.removeGroup(groupEntry.data as GroupInList),
-          title: '',
-          icon: 'trash',
-          compact: true,
-        });
-      }
-    }
-  }
+  constructor(private groupsService: GroupsService) {}
 
-  onAddGroupDialog(dialogRef: TemplateRef<any>) {
-    this.dialogService.open(dialogRef);
-  }
+  idControl = (control: MemberGroupFormControl) => control.value;
+  idAllData = (data: GroupInList) => data.id;
 
-  removeGroup(group: GroupInList) {
-    const idx = this.groups.indexOf(group.id);
+  removeGroup(group: MemberGroupFormControl) {
+    const idx = this.membersFormArray.controls.indexOf(group);
     if (idx !== -1) {
-      this.groups = this.groups
-        .slice(0, idx)
-        .concat(this.groups.slice(idx + 1));
-      this.groups$.next(this.groups);
-      this.groupsChange.emit(this.groups);
-      if (this._onTouched) {
-        this._onTouched();
-      }
-      if (this._onChange) {
-        this._onChange(this.groups);
-      }
+      this.membersFormArray.removeAt(idx);
+      this.membersFormArray.markAsDirty();
+      this.membersFormArray.updateValueAndValidity();
     }
   }
 
-  addGroupClick(group: GroupInList) {
-    this.groups = this.groups.concat(group.id);
-    this.groups$.next(this.groups);
-    this.groupsChange.emit(this.groups);
-    if (this._onTouched) {
-      this._onTouched();
-    }
-    if (this._onChange) {
-      this._onChange(this.groups);
-    }
-  }
-
-  writeValue(value: string[]): void {
-    this.groups = value;
-    this.groups$.next(value);
-  }
-
-  registerOnChange(fn: any): void {
-    this._onChange = fn;
-  }
-
-  registerOnTouched(fn: any): void {
-    this._onTouched = fn;
-  }
-
-  setDisabledState?(isDisabled: boolean): void {
-    this.readOnly = isDisabled;
+  addGroup(group: GroupInList) {
+    this.membersFormArray.add(group.id);
+    this.membersFormArray.markAsDirty();
+    this.membersFormArray.updateValueAndValidity();
   }
 }

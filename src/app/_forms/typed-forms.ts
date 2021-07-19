@@ -7,22 +7,27 @@ import {
   FormGroup,
   ValidatorFn,
 } from '@angular/forms';
+import { BehaviorSubject, combineLatest, defer, Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 export interface ITypedAbstractControl<T> extends AbstractControl {
   readonly value: T;
+  readonly value$: Observable<T>;
 
-  setValue(value: T, options?: Object): void;
-  patchValue(value: T, options?: Object): void;
-  reset(value?: T, options?: Object): void;
+  setValue(value: T, options?: object): void;
+  patchValue(value: T, options?: object): void;
+  reset(value?: T, options?: object): void;
 }
 
-export interface ITypedFormControl<T>
+export interface ITypedFormControl<TResult>
   extends FormControl,
-    ITypedAbstractControl<T> {
-  readonly value: T;
+    ITypedAbstractControl<TResult> {
+  readonly value: TResult;
+  readonly valueChanges: Observable<TResult>;
+  readonly value$: Observable<TResult>;
 
   setValue(
-    value: T,
+    value: TResult,
     options?: {
       onlySelf?: boolean;
       emitEvent?: boolean;
@@ -32,7 +37,7 @@ export interface ITypedFormControl<T>
   ): void;
 
   patchValue(
-    value: T,
+    value: TResult,
     options?: {
       onlySelf?: boolean;
       emitEvent?: boolean;
@@ -42,7 +47,7 @@ export interface ITypedFormControl<T>
   ): void;
 
   reset(
-    formState?: T,
+    formState?: TResult,
     options?: {
       onlySelf?: boolean;
       emitEvent?: boolean;
@@ -61,6 +66,8 @@ export interface ITypedFormGroup<
     ITypedAbstractControl<TResult> {
   controls: TControls;
   value: TResult;
+  readonly valueChanges: Observable<TResult>;
+  readonly value$: Observable<TResult>;
 
   registerControl(
     name: string,
@@ -127,6 +134,8 @@ export interface ITypedFormArray<
     ITypedAbstractControl<TResult> {
   controls: TControls;
   value: TResult;
+  readonly valueChanges: Observable<TResult>;
+  readonly value$: Observable<TResult>;
 
   at(index: number): ITypedAbstractControl<TElementType>;
   push(control: ITypedAbstractControl<TElementType>): void;
@@ -157,10 +166,24 @@ export interface ITypedFormArray<
   getRawValue(): TResult;
 }
 
-export class TypedFormControl<T>
+export class TypedFormControl<TResult>
   extends FormControl
-  implements ITypedFormControl<T> {
-  value: T;
+  implements ITypedFormControl<TResult> {
+  value: TResult;
+  readonly value$: Observable<TResult> = defer(() =>
+    this.valueChanges.pipe(startWith(this.value))
+  );
+  private readonly _parent$ = new BehaviorSubject<FormGroup | FormArray>(
+    this.parent
+  );
+  readonly parent$: Observable<
+    FormGroup | FormArray
+  > = this._parent$.asObservable();
+
+  setParent(parent: FormGroup | FormArray) {
+    super.setParent(parent);
+    this._parent$.next(parent);
+  }
 }
 
 export class TypedFormGroup<
@@ -173,6 +196,16 @@ export class TypedFormGroup<
   implements ITypedFormGroup<TResult, TControls> {
   controls: TControls;
   value: TResult;
+  readonly valueChanges: Observable<TResult>;
+  readonly value$: Observable<TResult> = defer(() =>
+    this.valueChanges.pipe(startWith(this.value))
+  );
+  private readonly _parent$ = new BehaviorSubject<FormGroup | FormArray>(
+    this.parent
+  );
+  readonly parent$: Observable<
+    FormGroup | FormArray
+  > = this._parent$.asObservable();
 
   constructor(
     controls: TControls,
@@ -184,31 +217,60 @@ export class TypedFormGroup<
     asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null
   ) {
     super(controls, validatorOrOpts, asyncValidator);
+    // Set parent again, so it'll have a valid chained parent
+    for (const control of Object.values(this.controls)) {
+      if (control.parent$) {
+        control.setParent(this);
+      }
+    }
+  }
+
+  setParent(parent: FormGroup | FormArray) {
+    super.setParent(parent);
+    this._parent$.next(parent);
   }
 
   registerControl<TKey extends keyof TResult>(
     name: TKey,
     control: ITypedAbstractControl<TResult[TKey]>
   ): ITypedAbstractControl<TResult[TKey]> {
-    return super.registerControl(<string>name, control);
+    return super.registerControl(
+      name as string,
+      control
+    ) as ITypedAbstractControl<TResult[TKey]>;
   }
   addControl<TKey extends keyof TResult>(
     name: TKey,
     control: ITypedAbstractControl<TResult[TKey]>
   ): void {
-    super.registerControl(<string>name, control);
+    super.registerControl(name as string, control);
   }
   removeControl<TKey extends keyof TResult>(name: TKey): void {
-    super.removeControl(<string>name);
+    super.removeControl(name as string);
   }
   setControl<TKey extends keyof TResult>(
     name: TKey,
     control: ITypedAbstractControl<TResult[TKey]>
   ): void {
-    super.setControl(<string>name, control);
+    super.setControl(name as string, control);
   }
   contains<TKey extends keyof TResult>(controlName: TKey): boolean {
-    return super.contains(<string>controlName);
+    return super.contains(controlName as string);
+  }
+
+  public onChange<TKeys extends keyof TResult>(
+    controls: TKeys[]
+  ): Observable<Pick<TResult, TKeys>> {
+    return combineLatest(
+      controls.map((control) => this.controls[control].value$)
+    ).pipe(
+      map((vals) =>
+        controls.reduce((o, key, idx) => {
+          o[key as any] = vals[idx];
+          return o;
+        }, {} as Pick<TResult, TKeys>)
+      )
+    );
   }
 }
 
@@ -221,6 +283,16 @@ export class TypedFormArray<
   implements ITypedFormArray<TElementType, TControls, TResult> {
   controls: TControls;
   value: TResult;
+  readonly valueChanges: Observable<TResult>;
+  readonly value$: Observable<TResult> = defer(() =>
+    this.valueChanges.pipe(startWith(this.value))
+  );
+  private readonly _parent$ = new BehaviorSubject<FormGroup | FormArray>(
+    this.parent
+  );
+  readonly parent$: Observable<
+    FormGroup | FormArray
+  > = this._parent$.asObservable();
 
   constructor(
     controls: TControls,
@@ -232,10 +304,21 @@ export class TypedFormArray<
     asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null
   ) {
     super(controls, validatorOrOpts, asyncValidator);
+    // Set parent again, so it'll have a valid chained parent
+    for (const control of this.controls) {
+      if ((control as any).parent$) {
+        control.setParent(this);
+      }
+    }
+  }
+
+  setParent(parent: FormGroup | FormArray) {
+    super.setParent(parent);
+    this._parent$.next(parent);
   }
 
   at(index: number): ITypedAbstractControl<TElementType> {
-    return super.at(index);
+    return super.at(index) as ITypedAbstractControl<TElementType>;
   }
   push(control: ITypedAbstractControl<TElementType>): void {
     super.push(control);
@@ -251,6 +334,6 @@ export class TypedFormArray<
   }
 
   getRawValue(): TResult {
-    return this.getRawValue();
+    return super.getRawValue() as TResult;
   }
 }

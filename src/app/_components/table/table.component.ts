@@ -13,13 +13,20 @@ import {
   NbTreeGridDataSource,
   NbSortRequest,
 } from '@nebular/theme';
+import { Observable } from 'rxjs';
 
 export interface TableEntry {
   data: Record<string, any>;
 }
 
+export interface ITableEntry<T> extends TableEntry {
+  data: T;
+}
+
 export interface TableColumn {
   key?: string;
+  value?: (entry: TableEntry) => string;
+  value$?: (entry: TableEntry) => Observable<string>;
   title: string;
   icon?: string;
   compact?: boolean;

@@ -1,34 +1,15 @@
-<nb-card [nbSpinner]="loading">
-  <nb-card-header>
-    <span>Groups / Roles</span>
-    <nb-actions>
-      <nb-action icon="plus" (click)="onAddGroupDialog(addGroupDialog)"
-        >Add</nb-action
-      >
-    </nb-actions>
-  </nb-card-header>
-  <nb-card-body>
-    <app-table
-      [columns]="columnsEdit"
-      [data]="accessGroupsData$ | async"
-    ></app-table>
-  </nb-card-body>
-</nb-card>
-
-<ng-template #addGroupDialog let-ref="dialogRef">
-  <nb-card [nbSpinner]="!(allGroupsData$ | async)">
-    <nb-card-header>
-      <span>Add Group</span>
-    </nb-card-header>
-    <nb-card-body>
-      <app-table
-        [columns]="columnsView"
-        [data]="allGroupsData$ | async"
-        (clickItem)="ref.close(); addGroupClick($event.data)"
-      ></app-table>
-    </nb-card-body>
-  </nb-card>
-</ng-template>
+<app-table-form-array-edit
+  title="Groups / Roles"
+  addTitle="Add Group"
+  [data]="accessGroupsFormArray"
+  [allData]="allGroupsData$ | async"
+  [columnsView]="columnsView"
+  [columnsEdit]="columnsEdit"
+  [columnsAdd]="columnsAdd"
+  [idControl]="idControl"
+  [idAllData]="idAllData"
+  (addEntry)="addGroup($event)"
+></app-table-form-array-edit>
 
 <ng-template #rolesSelect let-column="column" let-row="row">
   <input
@@ -36,7 +17,7 @@
     type="text"
     fullWidth
     placeholder="Roles"
-    [(ngModel)]="row.data[column.key]"
+    [(ngModel)]="row.data.controls[column.key].value"
     (ngModelChange)="updateRoleInput(row, $event)"
   />
 </ng-template>

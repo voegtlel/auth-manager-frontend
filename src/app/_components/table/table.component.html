@@ -52,7 +52,13 @@
     >
       <ng-container *ngIf="!column.templateRef">
         <ng-container *ngIf="!column.action">{{
-          column.key ? row.data[column.key] : ""
+          column.value
+            ? column.value(row)
+            : column.value$
+            ? (column.value$(row) | async)
+            : column.key
+            ? row.data[column.key]
+            : ""
         }}</ng-container>
         <button
           *ngIf="column.action"
@@ -63,9 +69,16 @@
           ghost
         >
           <nb-icon *ngIf="column.icon" [icon]="column.icon"></nb-icon
-          ><ng-container *ngIf="column.key">{{
-            row.data[column.key]
-          }}</ng-container>
+          ><ng-container *ngIf="column.value">{{
+            column.value(row)
+          }}</ng-container
+          ><ng-container *ngIf="column.value$">{{
+            column.value$(row) | async
+          }}</ng-container
+          ><ng-container
+            *ngIf="!column.value && !column.value$ && column.key"
+            >{{ row.data[column.key] }}</ng-container
+          >
         </button>
       </ng-container>
       <ng-container *ngIf="column.templateRef">

@@ -36,14 +36,18 @@
           ></app-set-password>
           <app-set-email
             *ngSwitchCase="'email'"
-            [emailProperty]="propertiesByKey.email"
-            [emailVerifiedProperty]="propertiesByKey.email_verified"
-            [emailForwardProperty]="propertiesByKey.forward_emails"
-            [hasEmailAliasProperty]="propertiesByKey.has_email_alias"
-            [emailAliasProperty]="propertiesByKey.email_alias"
+            [propertyGroup]="group"
             [isActive]="activeProperty?.value"
             [userId]="userId"
           ></app-set-email>
+          <app-user-group-edit
+            *ngSwitchCase="'groups'"
+            [userId]="userId"
+            [propertyGroup]="group"
+            [isActive]="activeProperty?.value"
+            (valueChange)="onValueChange($event.property.key, $event.value)"
+            (validChange)="onValidChange($event.property.key, $event.valid)"
+          ></app-user-group-edit>
         </ng-container>
         <div class="spacing">
           <hr />

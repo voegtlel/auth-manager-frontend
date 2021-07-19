@@ -1,31 +1,22 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  OnDestroy,
-} from '@angular/core';
-import { FormControl, FormArray } from '@angular/forms';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { TypedFormArray, TypedFormControl } from 'src/app/_forms/typed-forms';
 
 @Component({
   selector: 'app-string-list-edit',
   templateUrl: './string-list-edit.component.html',
   styleUrls: ['./string-list-edit.component.scss'],
 })
-export class StringListEditComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() entriesFormArray: FormArray;
+export class StringListEditComponent implements OnInit, OnDestroy {
+  @Input() formArray: TypedFormArray<string>;
 
   @Input() placeholder: string;
   @Input() placeholderAdd: string;
 
   statusChangesSubscription: Subscription;
 
-  clientIdControl = new FormControl('');
-
   get disabled(): boolean {
-    return this.entriesFormArray.disabled;
+    return this.formArray.disabled;
   }
 
   constructor() {}
@@ -39,28 +30,10 @@ export class StringListEditComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.entriesFormArray) {
-      if (this.statusChangesSubscription) {
-        this.statusChangesSubscription.unsubscribe();
-        this.statusChangesSubscription = null;
-      }
-      this.statusChangesSubscription = this.entriesFormArray.statusChanges.subscribe(
-        () => {
-          if (this.entriesFormArray.disabled) {
-            this.clientIdControl.disable();
-          } else {
-            this.clientIdControl.enable();
-          }
-        }
-      );
-    }
-  }
-
   removeEntry(index: number) {
-    this.entriesFormArray.removeAt(index);
-    this.entriesFormArray.markAsDirty({ onlySelf: true });
-    this.entriesFormArray.updateValueAndValidity();
+    this.formArray.removeAt(index);
+    this.formArray.markAsDirty();
+    this.formArray.updateValueAndValidity();
   }
 
   addEntry($event: Event) {
@@ -69,12 +42,11 @@ export class StringListEditComponent implements OnInit, OnChanges, OnDestroy {
     if (this.disabled) {
       return;
     }
-    const newControl = new FormControl('');
-    this.entriesFormArray.push(newControl);
+    const newControl = new TypedFormControl<string>('');
+    this.formArray.push(newControl);
     newControl.markAsDirty();
     newControl.markAsTouched();
-    this.entriesFormArray.markAsDirty({ onlySelf: true });
-    this.clientIdControl.reset('');
-    this.entriesFormArray.updateValueAndValidity();
+    this.formArray.markAsDirty();
+    this.formArray.updateValueAndValidity();
   }
 }

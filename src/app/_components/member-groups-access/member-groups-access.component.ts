@@ -1,133 +1,58 @@
 import {
   Component,
   Input,
-  OnDestroy,
-  OnChanges,
-  SimpleChanges,
   TemplateRef,
-  Output,
-  EventEmitter,
-  forwardRef,
   ViewChild,
   OnInit,
 } from '@angular/core';
-import { NbDialogService } from '@nebular/theme';
-import { Subject, Observable, BehaviorSubject, combineLatest } from 'rxjs';
-import { takeUntil, map, filter } from 'rxjs/operators';
-import { GroupInList } from 'src/app/_models/user_group';
+import { GroupInList } from 'src/app/_models/group';
 import { GroupsService } from 'src/app/_services/groups.service';
 import {
-  TableEntry,
   TableColumn,
+  ITableEntry,
 } from 'src/app/_components/table/table.component';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ClientAccessGroup } from 'src/app/_models/client';
+import {
+  ClientAccessGroupFormGroup,
+  ClientAccessGroupsFormArray,
+} from 'src/app/_forms/client-form';
+import { map } from 'rxjs/operators';
 
-interface AccessGroupEntry extends GroupInList {
-  roles: string;
-  index: number;
-}
-
-interface AccessGroupTableEntry extends TableEntry {
-  data: AccessGroupEntry;
-}
+declare type AccessGroupTableEntry = ITableEntry<ClientAccessGroupFormGroup>;
 
 @Component({
   selector: 'app-member-groups-access',
   templateUrl: './member-groups-access.component.html',
   styleUrls: ['./member-groups-access.component.scss'],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => MemberGroupsAccessComponent),
-      multi: true,
-    },
-  ],
 })
-export class MemberGroupsAccessComponent
-  implements OnDestroy, OnChanges, OnInit, ControlValueAccessor {
-  @Input() accessGroups: ClientAccessGroup[];
-  @Output() accessGroupsChange = new EventEmitter<ClientAccessGroup[]>();
+export class MemberGroupsAccessComponent implements OnInit {
+  @Input() accessGroupsFormArray: ClientAccessGroupsFormArray;
 
   @ViewChild('rolesSelect', { static: true }) rolesSelect: TemplateRef<any>;
 
-  destroyed$ = new Subject<void>();
-
-  groups$ = new BehaviorSubject<ClientAccessGroup[]>(null);
-
-  allGroupsData$: Observable<AccessGroupTableEntry[]>;
-  accessGroupsData$: Observable<AccessGroupTableEntry[]>;
-
-  columnsView: TableColumn[] = [
-    { key: 'id', title: 'Id', clickableCells: true },
-    { key: 'group_name', title: 'Name', clickableCells: true },
-  ];
-
-  columnsEdit: TableColumn[] = [
+  columnsAdd: TableColumn[] = [
     { key: 'id', title: 'Id' },
     { key: 'group_name', title: 'Name' },
   ];
 
-  loading = true;
-  lastError: string;
-  _onChange: (groups: ClientAccessGroup[]) => void;
-  _onTouched: () => void;
+  columnsView: TableColumn[] = [
+    { key: 'group_id', title: 'Id', clickableCells: true },
+    {
+      key: 'group_name',
+      value$: (entry: AccessGroupTableEntry) =>
+        entry.data.controls.group.group$.pipe(map((group) => group.group_name)),
+      title: 'Name',
+      clickableCells: true,
+    },
+  ];
 
-  constructor(
-    private groupsService: GroupsService,
-    private dialogService: NbDialogService
-  ) {
-    this.groupsService.groups$
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(() => {
-        this.loading = false;
-      });
-    const userGroups$: Observable<AccessGroupEntry[]> = combineLatest([
-      this.groups$.pipe(filter((g) => !!g)),
-      this.groupsService.groupsById$,
-    ]).pipe(
-      map(([userGroups, groupsById]) =>
-        userGroups.map((userGroup, index) => ({
-          ...(groupsById[userGroup.group] ?? {
-            id: userGroup.group,
-            visible: false,
-            group_name: userGroup.group,
-            enable_email: false,
-            enable_postbox: false,
-          }),
-          roles: userGroup.roles.join(','),
-          index,
-        }))
-      )
-    );
-    this.accessGroupsData$ = userGroups$.pipe(
-      map((groups) =>
-        groups.map((group) => ({
-          data: group,
-        }))
-      )
-    );
-    this.allGroupsData$ = combineLatest([
-      this.groups$.pipe(filter((g) => !!g)),
-      this.groupsService.groups$.pipe(takeUntil(this.destroyed$)),
-    ]).pipe(
-      map(([userGroups, allGroups]) =>
-        allGroups.filter(
-          (group) =>
-            !userGroups.some((userGroup) => userGroup.group === group.id)
-        )
-      ),
-      map((groups) =>
-        groups.map((group, index) => ({ data: { ...group, roles: '', index } }))
-      )
-    );
-  }
+  columnsEdit: TableColumn[];
+
+  allGroupsData$ = this.groupsService.groups$;
+
+  constructor(private groupsService: GroupsService) {}
 
   ngOnInit(): void {
-    this.columnsEdit = [
-      { key: 'id', title: 'Id' } as TableColumn,
-      { key: 'group_name', title: 'Name' } as TableColumn,
-    ].concat(
+    this.columnsEdit = this.columnsView.concat(
       {
         key: 'roles',
         title: 'Mapped Roles',
@@ -135,7 +60,7 @@ export class MemberGroupsAccessComponent
       } as TableColumn,
       {
         action: (groupEntry: AccessGroupTableEntry) =>
-          this.removeGroup(groupEntry.data as AccessGroupEntry),
+          this.removeGroup(groupEntry.data),
         title: '',
         icon: 'trash',
         compact: true,
@@ -143,78 +68,26 @@ export class MemberGroupsAccessComponent
     );
   }
 
-  ngOnDestroy(): void {
-    this.destroyed$.next();
-    this.destroyed$.complete();
-  }
+  idControl = (control: ClientAccessGroupFormGroup) =>
+    control.controls.group.value;
+  idAllData = (data: GroupInList) => data.id;
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.groups) {
-      this.groups$.next(changes.groups.currentValue);
-    }
-  }
-
-  onAddGroupDialog(dialogRef: TemplateRef<any>) {
-    this.dialogService.open(dialogRef);
-  }
-
-  removeGroup(group: AccessGroupEntry) {
-    const idx = this.accessGroups.findIndex(
-      (accessGroup) => accessGroup.group === group.id
-    );
+  removeGroup(group: ClientAccessGroupFormGroup) {
+    const idx = this.accessGroupsFormArray.controls.indexOf(group);
     if (idx !== -1) {
-      this.accessGroups = this.accessGroups
-        .slice(0, idx)
-        .concat(this.accessGroups.slice(idx + 1));
-      this.groups$.next(this.accessGroups);
-      this.accessGroupsChange.emit(this.accessGroups);
-      if (this._onTouched) {
-        this._onTouched();
-      }
-      if (this._onChange) {
-        this._onChange(this.accessGroups);
-      }
+      this.accessGroupsFormArray.removeAt(idx);
+      this.accessGroupsFormArray.markAsDirty();
+      this.accessGroupsFormArray.updateValueAndValidity();
     }
   }
 
-  addGroupClick(group: AccessGroupEntry) {
-    this.accessGroups = this.accessGroups.concat({
-      group: group.id,
-      roles: [],
-    });
-    this.groups$.next(this.accessGroups);
-    this.accessGroupsChange.emit(this.accessGroups);
-    if (this._onTouched) {
-      this._onTouched();
-    }
-    if (this._onChange) {
-      this._onChange(this.accessGroups);
-    }
-  }
-
-  writeValue(value: ClientAccessGroup[]): void {
-    this.accessGroups = value;
-    this.groups$.next(value);
+  addGroup(group: GroupInList) {
+    this.accessGroupsFormArray.add(group.id);
+    this.accessGroupsFormArray.markAsDirty();
+    this.accessGroupsFormArray.updateValueAndValidity();
   }
 
   updateRoleInput(row: AccessGroupTableEntry, $event: string): void {
-    this.accessGroups[row.data.index].roles = $event.split(',');
-    // Note: Do not next the groups$, because nothing changed in that structure.
-    // this.groups$.next(this.accessGroups);
-    this.accessGroupsChange.emit(this.accessGroups);
-    if (this._onTouched) {
-      this._onTouched();
-    }
-    if (this._onChange) {
-      this._onChange(this.accessGroups);
-    }
-  }
-
-  registerOnChange(fn: any): void {
-    this._onChange = fn;
-  }
-
-  registerOnTouched(fn: any): void {
-    this._onTouched = fn;
+    row.data.controls.roles.setValueByCommaSeparatedString($event);
   }
 }

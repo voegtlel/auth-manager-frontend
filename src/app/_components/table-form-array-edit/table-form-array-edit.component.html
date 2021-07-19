@@ -1,0 +1,31 @@
+<nb-card
+  [nbSpinner]="data == null || columnsView == null || columnsEdit == null"
+>
+  <nb-card-header>
+    <span>{{ title }}</span>
+    <nb-actions *ngIf="!(disabled$ | async)">
+      <nb-action icon="plus" (click)="onAddDialog(addDialog)">Add</nb-action>
+    </nb-actions>
+  </nb-card-header>
+  <nb-card-body>
+    <app-table
+      [columns]="(disabled$ | async) ? columnsView : columnsEdit"
+      [data]="selectedData$ | async"
+    ></app-table>
+  </nb-card-body>
+</nb-card>
+
+<ng-template #addDialog let-ref="dialogRef">
+  <nb-card [nbSpinner]="allData == null || columnsAdd == null">
+    <nb-card-header>
+      <span>{{ addTitle }}</span>
+    </nb-card-header>
+    <nb-card-body>
+      <app-table
+        [columns]="columnsAdd"
+        [data]="remainingData$ | async"
+        (clickItem)="ref.close(); addClick($event.data)"
+      ></app-table>
+    </nb-card-body>
+  </nb-card>
+</ng-template>

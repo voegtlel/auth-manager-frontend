@@ -1,7 +1,5 @@
 <nb-card>
-  <nb-card-header>
-    <ng-container> Client </ng-container>
-  </nb-card-header>
+  <nb-card-header> Client </nb-card-header>
   <nb-card-body [nbSpinner]="loading || saving">
     <form (submit)="submit($event)" [formGroup]="form">
       <div class="form-control-group">
@@ -11,19 +9,22 @@
           nbInput
           fullWidth
           placeholder="Client ID"
-          formControlName="id"
-          [status]="form.get('id').valid ? 'basic' : 'danger'"
+          [formControl]="form.controls.id"
+          [status]="form.controls.id.valid ? 'basic' : 'danger'"
           #client_id_el
         />
-        <div *ngIf="form.get('id').hasError('required')" class="error-message">
+        <div
+          *ngIf="form.controls.id.hasError('required')"
+          class="error-message"
+        >
           Required.
         </div>
-        <div *ngIf="form.get('id').hasError('pattern')" class="error-message">
+        <div *ngIf="form.controls.id.hasError('pattern')" class="error-message">
           Contains invalid characters, allowed characters: 'a'-'z', 'A'-'Z',
           '0'-'9', '_', '.', '+', '-'.
         </div>
         <div
-          *ngIf="form.get('id').hasError('clientExists')"
+          *ngIf="form.controls.id.hasError('clientExists')"
           class="error-message"
         >
           A client with this ID already exists.
@@ -37,12 +38,12 @@
           nbInput
           fullWidth
           placeholder="Notes"
-          formControlName="notes"
-          [status]="form.get('notes').valid ? 'basic' : 'danger'"
+          [formControl]="form.controls.notes"
+          [status]="form.controls.notes.valid ? 'basic' : 'danger'"
           #group_notes_el
         ></textarea>
         <div
-          *ngIf="form.get('notes').hasError('required')"
+          *ngIf="form.controls.notes.hasError('required')"
           class="error-message"
         >
           Required.
@@ -52,7 +53,7 @@
       <div class="form-control-group">
         <label class="label" [for]="redirect_uri_el">Redirect URIs</label>
         <app-string-list-edit
-          [entriesFormArray]="form.get('redirect_uri')"
+          [formArray]="form.controls.redirect_uri"
           placeholder="Redirect URI"
           placeholderAdd="Add Redirect URI"
           #redirect_uri_el
@@ -65,7 +66,7 @@
           multiple
           fullWidth
           placeholder="Allowed Scopes"
-          formControlName="allowed_scope"
+          [formControl]="form.controls.allowed_scope"
           #allowed_scopes_el
         >
           <nb-option
@@ -75,7 +76,7 @@
           >
         </nb-select>
         <div
-          *ngIf="form.get('notes').hasError('required')"
+          *ngIf="form.controls.notes.hasError('required')"
           class="error-message"
         >
           Required.
@@ -100,13 +101,13 @@
             nbInput
             fullWidth
             placeholder="Client Secret"
-            formControlName="client_secret"
-            [status]="form.get('client_secret').valid ? 'basic' : 'danger'"
+            [formControl]="form.controls.client_secret"
+            [status]="form.controls.client_secret.valid ? 'basic' : 'danger'"
             #client_secret_el
           />
         </nb-form-field>
         <div
-          *ngIf="form.get('client_secret').hasError('required')"
+          *ngIf="form.controls.client_secret.hasError('required')"
           class="error-message"
         >
           Required.
@@ -121,9 +122,9 @@
           multiple
           fullWidth
           placeholder="Token Endpoint Auth Method"
-          formControlName="token_endpoint_auth_method"
+          [formControl]="form.controls.token_endpoint_auth_method"
           [status]="
-            form.get('token_endpoint_auth_method').valid ? 'basic' : 'danger'
+            form.controls.token_endpoint_auth_method.valid ? 'basic' : 'danger'
           "
           #token_endpoint_auth_method_el
         >
@@ -138,7 +139,7 @@
           <nb-option value="none">None</nb-option>
         </nb-select>
         <div
-          *ngIf="form.get('token_endpoint_auth_method').hasError('required')"
+          *ngIf="form.controls.token_endpoint_auth_method.hasError('required')"
           class="error-message"
         >
           Required.
@@ -151,8 +152,8 @@
           multiple
           fullWidth
           placeholder="Response Types"
-          formControlName="response_type"
-          [status]="form.get('response_type').valid ? 'basic' : 'danger'"
+          [formControl]="form.controls.response_type"
+          [status]="form.controls.response_type.valid ? 'basic' : 'danger'"
           #response_type_el
         >
           <nb-option value="code">Code</nb-option>
@@ -166,7 +167,7 @@
           >
         </nb-select>
         <div
-          *ngIf="form.get('response_type').hasError('required')"
+          *ngIf="form.controls.response_type.hasError('required')"
           class="error-message"
         >
           Required.
@@ -179,8 +180,8 @@
           multiple
           fullWidth
           placeholder="Grant Types"
-          formControlName="grant_type"
-          [status]="form.get('grant_type').valid ? 'basic' : 'danger'"
+          [formControl]="form.controls.grant_type"
+          [status]="form.controls.grant_type.valid ? 'basic' : 'danger'"
           #grant_type_el
         >
           <nb-option value="authorization_code">Authorization Code</nb-option>
@@ -189,22 +190,22 @@
           <nb-option value="password">Password (Dangerous!)</nb-option>
         </nb-select>
         <div
-          *ngIf="form.get('grant_type').hasError('required')"
+          *ngIf="form.controls.grant_type.hasError('required')"
           class="error-message"
         >
           Required.
         </div>
         <div
-          *ngIf="form.get('grant_type').hasError('missingTypes')"
+          *ngIf="form.controls.grant_type.hasError('missingTypes')"
           class="error-message"
         >
           Response Types require
-          {{ form.get("grant_type").getError("missingTypes").requiredTypes }}.
+          {{ form.controls.grant_type.getError("missingTypes").requiredTypes }}.
         </div>
       </div>
 
       <app-member-groups-access
-        formControlName="access_groups"
+        [accessGroupsFormArray]="form.controls.access_groups"
       ></app-member-groups-access>
 
       <button nbButton type="submit" [disabled]="!form.valid || form.pristine">

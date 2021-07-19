@@ -6,6 +6,10 @@ import { UserProperty } from '../_models/schema';
 import { UserListViewData, UsersListViewData } from '../_models/user';
 import { ApiService } from './api.service';
 
+export interface ResolvedUser extends Record<string, any> {
+  user_id: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -13,15 +17,21 @@ export class UsersService {
   private _reloading = false;
   private _reload$ = new BehaviorSubject(null);
   private _hot = false;
-  public readonly _userListViewData$: Observable<UsersListViewData>;
-  public readonly _users$: Observable<UserListViewData[]>;
-  public readonly _properties$: Observable<UserProperty[]>;
-  public readonly _usersById$: Observable<Record<string, UserListViewData>>;
+  private readonly _userListViewData$: Observable<UsersListViewData>;
+  private readonly _users$: Observable<UserListViewData[]>;
+  private readonly _properties$: Observable<UserProperty[]>;
+  private readonly _usersById$: Observable<Record<string, UserListViewData>>;
+  private readonly _resolvedUsers$: Observable<ResolvedUser[]>;
+  private readonly _resolvedUsersById$: Observable<
+    Record<string, ResolvedUser>
+  >;
 
   public get userListViewData$(): Observable<UsersListViewData> {
     this._makeHot();
     return this._userListViewData$;
   }
+
+  public get;
 
   public get users$(): Observable<UserListViewData[]> {
     this._makeHot();
@@ -34,6 +44,16 @@ export class UsersService {
   public get usersById$(): Observable<Record<string, UserListViewData>> {
     this._makeHot();
     return this._usersById$;
+  }
+
+  public get resolvedUsers$(): Observable<ResolvedUser[]> {
+    this._makeHot();
+    return this._resolvedUsers$;
+  }
+
+  public get resolvedUsersById$(): Observable<Record<string, ResolvedUser>> {
+    this._makeHot();
+    return this._resolvedUsersById$;
   }
 
   constructor(apiService: ApiService, private toastr: NbToastrService) {
@@ -50,6 +70,30 @@ export class UsersService {
       map((userListViewData) => userListViewData.properties)
     );
     this._usersById$ = this._users$.pipe(
+      map((users) =>
+        users.reduce((o, user) => {
+          o[user.user_id] = user;
+          return o;
+        }, {})
+      ),
+      shareReplay(1)
+    );
+
+    this._resolvedUsers$ = this._users$.pipe(
+      map((users) =>
+        users.map((user) =>
+          user.properties.reduce(
+            (o, prop) => {
+              o[prop.key] = prop.value;
+              return o;
+            },
+            { user_id: user.user_id }
+          )
+        )
+      ),
+      shareReplay(1)
+    );
+    this._resolvedUsersById$ = this._resolvedUsers$.pipe(
       map((users) =>
         users.reduce((o, user) => {
           o[user.user_id] = user;

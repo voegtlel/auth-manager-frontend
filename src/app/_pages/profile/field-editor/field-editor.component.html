@@ -266,18 +266,4 @@
       [externalError]="externalError"
     ></app-field-editor>
   </ng-container>
-  <ng-container *ngSwitchCase="'groups'">
-    <app-member-groups-options
-      [groups]="property.value"
-      (groupsChange)="
-        property.value = $event;
-        valueChange.emit({ property: property, value: $event })
-      "
-      [additionalGroups]="additionalGroupProperties"
-      (additionalGroupsChange)="valueChange.emit($event)"
-      [isAdmin]="isAdmin"
-      [isSelf]="isSelf"
-      [readOnly]="!canEdit"
-    ></app-member-groups-options>
-  </ng-container>
 </ng-container>

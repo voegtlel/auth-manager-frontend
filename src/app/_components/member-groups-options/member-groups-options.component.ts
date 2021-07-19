@@ -19,7 +19,7 @@ import {
   distinctUntilChanged,
   shareReplay,
 } from 'rxjs/operators';
-import { GroupInList } from 'src/app/_models/user_group';
+import { GroupInList } from 'src/app/_models/group';
 import { GroupsService } from 'src/app/_services/groups.service';
 import {
   TableEntry,
@@ -104,6 +104,7 @@ export class MemberGroupsOptionsComponent
             id: userGroup,
             visible: false,
             group_name: userGroup,
+            group_type: null,
             enable_email: false,
             enable_postbox: false,
           }),

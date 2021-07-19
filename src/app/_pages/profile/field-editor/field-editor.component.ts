@@ -43,8 +43,6 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
     valid: boolean;
   }>();
 
-  additionalGroupProperties: UserPropertyWithValue[];
-
   _dateValueStr: string;
   _dateValue: Date;
 
@@ -192,13 +190,6 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.property) {
       this.validate();
-    }
-    if (changes.propertiesByKey) {
-      this.additionalGroupProperties = [
-        changes.propertiesByKey.currentValue.email_allowed_forward_groups,
-        changes.propertiesByKey.currentValue.email_forward_groups,
-        changes.propertiesByKey.currentValue.email_postbox_access_groups,
-      ].filter((x) => !!x);
     }
   }
 

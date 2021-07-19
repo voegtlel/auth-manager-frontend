@@ -17,7 +17,7 @@ export interface UserFilter {
   operand?: UserFilter;
 }
 
-export type UserGroupPropertyType = 'default' | 'email' | 'password';
+export type UserGroupPropertyType = 'default' | 'email' | 'password' | 'groups';
 
 export interface UserViewGroup {
   title: string;

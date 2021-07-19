@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { UserPropertyWithValue } from 'src/app/_models/user';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { UserPropertyWithValue, UserViewDataGroup } from 'src/app/_models/user';
 import { ApiService } from 'src/app/_services/api.service';
 import { NbToastrService } from '@nebular/theme';
 import { AuthService } from 'src/app/_services/auth.service';
@@ -9,14 +9,16 @@ import { AuthService } from 'src/app/_services/auth.service';
   templateUrl: './set-email.component.html',
   styleUrls: ['./set-email.component.scss'],
 })
-export class SetEmailComponent {
+export class SetEmailComponent implements OnChanges {
   @Input() userId: string;
   @Input() isActive: boolean;
-  @Input() emailProperty: UserPropertyWithValue;
-  @Input() emailVerifiedProperty: UserPropertyWithValue;
-  @Input() emailForwardProperty: UserPropertyWithValue;
-  @Input() hasEmailAliasProperty: UserPropertyWithValue;
-  @Input() emailAliasProperty: UserPropertyWithValue;
+  @Input() propertyGroup: UserViewDataGroup;
+
+  emailProperty: UserPropertyWithValue;
+  emailVerifiedProperty: UserPropertyWithValue;
+  emailForwardProperty: UserPropertyWithValue;
+  hasEmailAliasProperty: UserPropertyWithValue;
+  emailAliasProperty: UserPropertyWithValue;
 
   updateValue: Record<string, any> = {};
   valid = true;
@@ -41,6 +43,31 @@ export class SetEmailComponent {
     private authService: AuthService,
     private toastr: NbToastrService
   ) {}
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.propertyGroup) {
+      if (this.propertyGroup) {
+        const propsByKey: Record<
+          string,
+          UserPropertyWithValue
+        > = this.propertyGroup.properties.reduce((o, prop) => {
+          o[prop.key] = prop;
+          return o;
+        }, {});
+        this.emailProperty = propsByKey.email;
+        this.emailVerifiedProperty = propsByKey.email_verified;
+        this.emailForwardProperty = propsByKey.forward_emails;
+        this.hasEmailAliasProperty = propsByKey.has_email_alias;
+        this.emailAliasProperty = propsByKey.email_alias;
+      } else {
+        this.emailProperty = null;
+        this.emailVerifiedProperty = null;
+        this.emailForwardProperty = null;
+        this.hasEmailAliasProperty = null;
+        this.emailAliasProperty = null;
+      }
+    }
+  }
 
   submit($event) {
     $event.preventDefault();

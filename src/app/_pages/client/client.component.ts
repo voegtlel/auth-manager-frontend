@@ -15,16 +15,8 @@ import { AuthService } from 'src/app/_services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NbToastrService, NbDialogRef, NbDialogService } from '@nebular/theme';
 import { Client } from 'src/app/_models/client';
-
-const requiredGrantMap: Record<string, string[]> = {
-  code: ['authorization_code'],
-  token: [],
-  id_token: ['implicit'],
-  ['code token']: ['authorization_code', 'implicit'],
-  ['code id_token']: ['authorization_code', 'implicit'],
-  ['token id_token']: ['implicit'],
-  ['code token id_token']: ['authorization_code', 'implicit'],
-};
+import { ClientGroupForm } from 'src/app/_forms/client-form';
+import { GroupsService } from 'src/app/_services/groups.service';
 
 @Component({
   templateUrl: './client.component.html',
@@ -43,25 +35,9 @@ export class ClientComponent implements OnInit, OnDestroy {
 
   canGeneratePassword = !!window.crypto?.getRandomValues;
 
-  private _clientFormElements: Record<keyof Client, FormControl | FormArray> = {
-    id: new FormControl(
-      null,
-      [Validators.required, Validators.pattern(/^[a-zA-Z0-9_.+-]+$/)],
-      [(x) => this.validateFormId(x)]
-    ),
-    notes: new FormControl(null),
-    redirect_uri: new FormArray([]),
-    allowed_scope: new FormControl([]),
-    client_secret: new FormControl(null),
-    token_endpoint_auth_method: new FormControl([]),
-    response_type: new FormControl([]),
-    grant_type: new FormControl([], (control) =>
-      this.validateGrantTypes(control)
-    ),
-    access_groups: new FormControl([]),
-  };
-
-  form = new FormGroup(this._clientFormElements);
+  form = new ClientGroupForm(this.groupsService.groupsById$, null, [
+    (x) => this.validateFormId(x),
+  ]);
 
   get isNew(): boolean {
     return this.clientId === 'new';
@@ -74,6 +50,7 @@ export class ClientComponent implements OnInit, OnDestroy {
   constructor(
     private api: ApiService,
     private clientsService: ClientsService,
+    private groupsService: GroupsService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
@@ -106,40 +83,24 @@ export class ClientComponent implements OnInit, OnDestroy {
         (clientData: Client) => {
           this.loading = false;
           if (clientData === null) {
-            this.form.reset({
-              id: null,
-              notes: null,
-              redirect_uri: [''],
-              allowed_scope: [],
-              client_secret: null,
-              token_endpoint_auth_method: [],
-              response_type: [],
-              grant_type: [],
-              access_groups: [],
-            } as Client);
-            const redirectUriFormArray = this._clientFormElements
-              .redirect_uri as FormArray;
-            while (redirectUriFormArray.length > 0) {
-              redirectUriFormArray.removeAt(0);
-            }
-            redirectUriFormArray.push(new FormControl(''));
+            this.form = new ClientGroupForm(
+              this.groupsService.groupsById$,
+              null,
+              [(x) => this.validateFormId(x)]
+            );
+            this.form.controls.id.enable();
             this.form.updateValueAndValidity();
-            console.log('Reset form:', this.form.value);
           } else {
-            const redirectUriFormArray = this._clientFormElements
-              .redirect_uri as FormArray;
-            while (redirectUriFormArray.length > 0) {
-              redirectUriFormArray.removeAt(0);
-            }
-            for (const clientUri of clientData.redirect_uri) {
-              redirectUriFormArray.push(new FormControl(clientUri));
-            }
-            this.form.reset(clientData);
+            this.form = new ClientGroupForm(
+              this.groupsService.groupsById$,
+              clientData,
+              [(x) => this.validateFormId(x)]
+            );
+            this.form.controls.id.disable();
             this.form.updateValueAndValidity();
           }
         },
         (err) => {
-          this.loading = false;
           this.loading = false;
           if (err?.status === 0) {
             this.toastr.danger(err?.statusText, 'Error');
@@ -177,10 +138,9 @@ export class ClientComponent implements OnInit, OnDestroy {
       return;
     }
     this.saving = true;
-    const formValue: Client = this.form.value;
     if (this.clientId === 'new') {
       this.api
-        .createClient(formValue)
+        .createClient(this.form.getRawValue())
         .toPromise()
         .then(
           () => {
@@ -205,7 +165,7 @@ export class ClientComponent implements OnInit, OnDestroy {
         );
     } else {
       this.api
-        .updateClient(this.clientId, formValue)
+        .updateClient(this.clientId, this.form.getRawValue())
         .toPromise()
         .then(
           () => {
@@ -235,29 +195,6 @@ export class ClientComponent implements OnInit, OnDestroy {
     this.form
       .get('client_secret')
       .setValue(this.authService.generatePassword());
-  }
-
-  validateGrantTypes(control: AbstractControl): ValidationErrors {
-    if (!this.form) {
-      return null;
-    }
-    const grantTypes = new Set<string>(control.value ?? []);
-    const missingTypes = new Set<string>();
-    const responseTypes: string[] = this.form.get('response_type').value;
-    if (!responseTypes) {
-      return;
-    }
-    for (const responseType of responseTypes) {
-      requiredGrantMap[responseType]
-        .filter((requiredType) => !grantTypes.has(requiredType))
-        .forEach((missingType) => missingTypes.add(missingType));
-    }
-    if (missingTypes.size > 0) {
-      return {
-        missingTypes: [...missingTypes].join(', '),
-      };
-    }
-    return null;
   }
 
   showDeleteClient(dialog: TemplateRef<any>) {

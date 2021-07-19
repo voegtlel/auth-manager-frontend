@@ -3,7 +3,7 @@
   <nb-card-body [nbSpinner]="loading || saving">
     <form *ngIf="form" (submit)="submit($event)" [formGroup]="form">
       <nb-accordion>
-        <nb-accordion-item>
+        <nb-accordion-item #userProperties>
           <nb-accordion-item-header
             >User Properties
             <nb-icon
@@ -13,11 +13,12 @@
           ></nb-accordion-item-header>
           <nb-accordion-item-body>
             <app-schema-user-properties
+              *ngIf="userProperties.expanded"
               [user_properties]="form.controls.user_properties"
             ></app-schema-user-properties>
           </nb-accordion-item-body>
         </nb-accordion-item>
-        <nb-accordion-item>
+        <nb-accordion-item #scopes>
           <nb-accordion-item-header
             >Scopes
             <nb-icon
@@ -27,13 +28,14 @@
           ></nb-accordion-item-header>
           <nb-accordion-item-body>
             <app-schema-scopes
+              *ngIf="scopes.expanded"
               [scopes]="form.controls.scopes"
               [user_properties]="form.controls.user_properties"
               [group_types]="form.controls.group_types"
             ></app-schema-scopes>
           </nb-accordion-item-body>
         </nb-accordion-item>
-        <nb-accordion-item>
+        <nb-accordion-item #groupTypes>
           <nb-accordion-item-header
             >Group Types
             <nb-icon
@@ -43,6 +45,7 @@
           ></nb-accordion-item-header>
           <nb-accordion-item-body>
             <app-schema-group-types
+              *ngIf="groupTypes.expanded"
               [group_types]="form.controls.group_types"
             ></app-schema-group-types>
           </nb-accordion-item-body>

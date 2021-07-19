@@ -66,7 +66,6 @@ import { MemberGroupsComponent } from './_components/member-groups/member-groups
 import { TableComponent } from './_components/table/table.component';
 import { GroupsComponent } from './_pages/groups/groups.component';
 import { GroupComponent } from './_pages/group/group.component';
-import { MemberUsersComponent } from './_components/member-users/member-users.component';
 import { ClientsComponent } from './_pages/clients/clients.component';
 import { ClientComponent } from './_pages/client/client.component';
 import { MemberGroupsAccessComponent } from './_components/member-groups-access/member-groups-access.component';
@@ -78,6 +77,9 @@ import { SchemaComponent } from './_pages/schema/schema.component';
 import { SchemaUserPropertiesComponent } from './_pages/schema/schema-user-properties/schema-user-properties.component';
 import { SchemaScopesComponent } from './_pages/schema/schema-scopes/schema-scopes.component';
 import { SchemaGroupTypesComponent } from './_pages/schema/schema-group-types/schema-group-types.component';
+import { UserViewComponent } from './_pages/user-view/user-view.component';
+import { TableFormArrayEditComponent } from './_components/table-form-array-edit/table-form-array-edit.component';
+import { UserGroupEditComponent } from './_pages/profile/user-group-edit/user-group-edit.component';
 
 @NgModule({
   declarations: [
@@ -96,9 +98,9 @@ import { SchemaGroupTypesComponent } from './_pages/schema/schema-group-types/sc
     MemberGroupsComponent,
     MemberGroupsAccessComponent,
     MemberGroupsOptionsComponent,
-    MemberUsersComponent,
     MemberUsersAccessComponent,
     TableComponent,
+    TableFormArrayEditComponent,
     GroupsComponent,
     GroupComponent,
     ClientsComponent,
@@ -109,6 +111,8 @@ import { SchemaGroupTypesComponent } from './_pages/schema/schema-group-types/sc
     SchemaUserPropertiesComponent,
     SchemaScopesComponent,
     SchemaGroupTypesComponent,
+    UserViewComponent,
+    UserGroupEditComponent,
   ],
   imports: [
     BrowserModule,

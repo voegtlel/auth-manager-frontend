@@ -1,0 +1,12 @@
+<app-member-groups-options
+  [groups]="groupProperty.value"
+  (groupsChange)="
+    groupProperty.value = $event;
+    valueChange.emit({ property: groupProperty, value: $event })
+  "
+  [additionalGroups]="additionalGroupProperties"
+  (additionalGroupsChange)="valueChange.emit($event)"
+  [isAdmin]="isAdmin"
+  [isSelf]="isSelf"
+  [readOnly]="!canEdit"
+></app-member-groups-options>
