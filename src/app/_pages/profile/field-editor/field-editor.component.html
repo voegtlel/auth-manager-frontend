@@ -234,13 +234,27 @@
         "
         #formControlEl
       />
-      <div *ngIf="!requiredMatch" class="error-message">Required.</div>
-      <div *ngIf="!formatMatch && requiredMatch" class="error-message">
-        Invalid format, must match {{ property.format_help }}.
-      </div>
-      <div *ngIf="externalError" class="error-message">
-        {{ externalErrorMessage }}
-      </div>
+      <ng-container *ngIf="canEdit">
+        <label class="label" [for]="repFormControlEl"
+          >Repeat {{ property.title }}</label
+        >
+        <input
+          type="password"
+          nbInput
+          fullWidth
+          fieldSize="medium"
+          [placeholder]="'Repeat ' + property.title"
+          [name]="'repeat_' + property.key"
+          [(ngModel)]="repeatPassword"
+          (ngModelChange)="validate()"
+          [readOnly]="!canEdit"
+          [status]="!passwordMatch ? 'danger' : 'basic'"
+          #repFormControlEl
+        />
+        <div *ngIf="!passwordMatch" class="error-message">
+          Must match {{ property.title }}
+        </div>
+      </ng-container>
     </div>
   </ng-container>
   <ng-container *ngSwitchCase="'picture'">
