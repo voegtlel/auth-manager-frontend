@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  TemplateRef,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NbDialogRef, NbDialogService, NbToastrService } from '@nebular/theme';
 import { combineLatest, of, Subject } from 'rxjs';
@@ -37,7 +43,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private router: Router,
     private toastr: NbToastrService,
     private dialogService: NbDialogService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private changeDetector: ChangeDetectorRef
   ) {}
 
   ngOnDestroy() {
@@ -134,6 +141,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.valids[key] = value;
     this.valid = Object.values(this.valids).every((x) => x);
     // console.log('Profile valid:', this.valid, this.valids);
+    this.changeDetector.detectChanges();
   }
 
   submit($event) {

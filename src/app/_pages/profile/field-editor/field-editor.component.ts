@@ -166,7 +166,8 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
     if (['email', 'picture'].includes(this.propertyType)) {
       return;
     }
-    const wasValid = this.formatMatch && this.requiredMatch;
+    const wasValid =
+      this.formatMatch && this.requiredMatch && this.passwordMatch;
     if (this.property.format && this.property.value) {
       const r = XRegExp(this.property.format);
       this.formatMatch = r.test(this.property.value);

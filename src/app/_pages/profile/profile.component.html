@@ -61,7 +61,11 @@
           >Send registration link</nb-checkbox
         >
       </div>
-      <button nbButton type="submit" [disabled]="!valid || !hasChange">
+      <button
+        nbButton
+        type="submit"
+        [disabled]="!valid || (!hasChange && !registrationToken)"
+      >
         <ng-container *ngIf="registrationToken"
           >Finish Registration</ng-container
         >
