@@ -193,11 +193,11 @@ export class UserScopeFormGroup extends TypedFormGroup<
     super({
       key: new TypedFormControl(scope?.key ?? '', [Validators.required]),
       title: new TypedFormControl(scope?.title ?? '', [Validators.required]),
-      protected: new TypedFormControl(scope?.protected),
+      protected: new TypedFormControl(scope?.protected ?? false),
       properties: new UserScopePropertyFormArray(scope?.properties ?? []),
     });
     this.controls.protected.disable();
-    if (scope.protected) {
+    if (scope?.protected) {
       this.controls.key.disable();
     }
   }
