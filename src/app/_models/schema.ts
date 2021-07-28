@@ -50,6 +50,7 @@ export interface UserScopeProperty {
   key?: string;
 
   group_type?: string;
+  group_by_name?: boolean;
 }
 
 export interface UserScope {
