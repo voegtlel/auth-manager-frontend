@@ -151,6 +151,17 @@
                 Required.
               </div>
             </div>
+            <div class="form-control-group">
+              <nb-checkbox
+                fullWidth
+                [formControl]="property.controls.group_by_name"
+                [status]="
+                  property.controls.group_by_name.valid ? 'basic' : 'danger'
+                "
+                #property_group_by_name_el
+                >Group By Name</nb-checkbox
+              >
+            </div>
 
             <button
               nbButton

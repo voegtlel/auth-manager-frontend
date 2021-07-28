@@ -143,6 +143,7 @@ export class UserScopePropertyFormGroup extends TypedFormGroup<
     user_property: TypedFormControl<string>;
     key: TypedFormControl<string>;
     group_type: TypedFormControl<string>;
+    group_by_name: TypedFormControl<boolean>;
   }
 > {
   constructor(scope?: UserScopeProperty) {
@@ -152,6 +153,7 @@ export class UserScopePropertyFormGroup extends TypedFormGroup<
       ]),
       key: new TypedFormControl(scope?.key),
       group_type: new TypedFormControl(scope?.group_type),
+      group_by_name: new TypedFormControl(null),
     });
   }
 
@@ -162,6 +164,9 @@ export class UserScopePropertyFormGroup extends TypedFormGroup<
     }
     if (result.group_type == null || result.group_type === '') {
       delete result.group_type;
+    }
+    if (!result.group_by_name) {
+      delete result.group_by_name;
     }
     return result;
   }

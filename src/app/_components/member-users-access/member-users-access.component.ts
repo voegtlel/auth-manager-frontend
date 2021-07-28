@@ -78,7 +78,7 @@ export class MemberUsersAccessComponent implements OnInit {
                 row.data.user$.pipe(
                   map(
                     (user) =>
-                      user.properties.find((x) => x.key === userColumn.key)
+                      user?.properties.find((x) => x.key === userColumn.key)
                         ?.value
                   )
                 ),
