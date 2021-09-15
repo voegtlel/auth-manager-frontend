@@ -54,7 +54,7 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
   tokenVisible = false;
   passwordMatch = true;
 
-  repeatPassword: string;
+  repeatPassword: string = null;
 
   private destroyed$ = new Subject<void>();
 
@@ -160,10 +160,13 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
     if (!this.property) {
       return;
     }
-    if ('password' === this.propertyType && !(this.isNew || this.registering)) {
+    if ('password' === this.propertyType && (this.isNew || this.registering)) {
+      this.passwordMatch = true;
+      this.requiredMatch = true;
       return;
     }
     if (['email', 'picture'].includes(this.propertyType)) {
+      this.requiredMatch = true;
       return;
     }
     const wasValid =
