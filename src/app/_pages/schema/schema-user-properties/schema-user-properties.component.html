@@ -243,6 +243,24 @@
             #default_el
           />
         </div>
+        <div class="form-control-group" *ngSwitchCase="'enum'">
+          <label class="label" [for]="default_el"
+            >Default Value
+            <nb-icon
+              icon="question-mark-circle-outline"
+              nbTooltip="Sets the default value of this property."
+            ></nb-icon
+          ></label>
+          <input
+            type="text"
+            nbInput
+            fullWidth
+            placeholder="Default"
+            [formControl]="user_property.controls.default"
+            [status]="user_property.controls.default.valid ? 'basic' : 'danger'"
+            #default_el
+          />
+        </div>
         <div class="form-control-group" *ngSwitchCase="'bool'">
           <nb-checkbox
             fullWidth
@@ -314,7 +332,7 @@
 
       <nb-card
         *ngIf="
-          user_property.controls.type.value === 'str' &&
+          user_property.controls.type.value === 'enum' &&
           (!user_property.controls.values.disabled ||
             user_property.controls.values.controls.length)
         "
@@ -323,7 +341,7 @@
           >Enum Values
           <nb-icon
             icon="question-mark-circle-outline"
-            nbTooltip="Only for strings. If any is set, only the specified values may be set for the property."
+            nbTooltip="Only for enums. If any is set, only the specified values may be set for the property."
           ></nb-icon
         ></nb-card-header>
         <nb-card-body>
