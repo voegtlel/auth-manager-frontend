@@ -59,6 +59,7 @@ export class MemberGroupsAccessComponent implements OnInit {
         templateRef: this.rolesSelect,
       } as TableColumn,
       {
+        key: '_remove',
         action: (groupEntry: AccessGroupTableEntry) =>
           this.removeGroup(groupEntry.data),
         title: '',

@@ -13,7 +13,7 @@
 <table
   *ngIf="dataSource"
   [nbTreeGrid]="dataSource"
-  [nbSort]="dataSource"
+  nbSort
   (sort)="updateSort($event)"
   [nbSpinner]="loading"
 >

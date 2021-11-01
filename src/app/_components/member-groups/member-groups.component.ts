@@ -42,6 +42,7 @@ export class MemberGroupsComponent {
   ];
 
   columnsEdit: TableColumn[] = this.columnsView.concat({
+    key: '_remove',
     action: (groupEntry: GroupTableEntry) =>
       this.removeGroup(groupEntry.data as MemberGroupFormControl),
     title: '',

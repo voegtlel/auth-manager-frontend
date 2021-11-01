@@ -45,7 +45,8 @@ interface GroupTableColumn extends TableColumn {
   styleUrls: ['./member-groups-options.component.scss'],
 })
 export class MemberGroupsOptionsComponent
-  implements OnInit, OnDestroy, OnChanges {
+  implements OnInit, OnDestroy, OnChanges
+{
   @Input() groups: string[];
   @Output() groupsChange = new EventEmitter<string[]>();
   @Input() readOnly = false;
@@ -184,6 +185,7 @@ export class MemberGroupsOptionsComponent
         }
         if (!readOnly) {
           columnsEdit.push({
+            key: '_remove',
             action: (groupEntry: AccessGroupTableEntry) =>
               this.removeGroup(groupEntry.data as AccessGroupEntry),
             title: '',

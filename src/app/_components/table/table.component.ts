@@ -24,7 +24,7 @@ export interface ITableEntry<T> extends TableEntry {
 }
 
 export interface TableColumn {
-  key?: string;
+  key: string;
   value?: (entry: TableEntry) => string;
   value$?: (entry: TableEntry) => Observable<string>;
   title: string;

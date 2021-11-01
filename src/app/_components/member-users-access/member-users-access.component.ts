@@ -116,6 +116,7 @@ export class MemberUsersAccessComponent implements OnInit {
             centerCells: true,
           } as TableColumn,
           {
+            key: '_remove',
             action: (groupEntry: UserTableEntry) =>
               this.removeUser(groupEntry.data as GroupUserEmailAccessFormGroup),
             title: '',

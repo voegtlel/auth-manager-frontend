@@ -93,6 +93,7 @@ export class AccessTokensComponent implements OnInit, OnDestroy, OnChanges {
   columnsEdit: TableColumn[] = [
     ...this.columnsView,
     {
+      key: '_remove',
       action: (groupEntry: AccessTokenTableEntry) =>
         this.removeAccessToken(groupEntry.data as AccessTokenEntry),
       title: '',
