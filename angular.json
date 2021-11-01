@@ -33,7 +33,7 @@
             "namedChunks": true
           },
           "configurations": {
-            "production": {
+            "prod": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -69,8 +69,8 @@
             "browserTarget": "authlib-usermanager-frontend:build"
           },
           "configurations": {
-            "production": {
-              "browserTarget": "authlib-usermanager-frontend:build:production"
+            "prod": {
+              "browserTarget": "authlib-usermanager-frontend:build:prod"
             }
           }
         },
@@ -110,8 +110,8 @@
             "devServerTarget": "authlib-usermanager-frontend:serve"
           },
           "configurations": {
-            "production": {
-              "devServerTarget": "authlib-usermanager-frontend:serve:production"
+            "prod": {
+              "devServerTarget": "authlib-usermanager-frontend:serve:prod"
             }
           }
         }
