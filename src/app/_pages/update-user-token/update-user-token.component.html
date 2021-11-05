@@ -1,0 +1,25 @@
+<nb-card>
+  <nb-card-header>Update User</nb-card-header>
+  <nb-card-body [nbSpinner]="saving">
+    <form (submit)="submit($event)" *ngIf="!saved">
+      <ng-container *ngFor="let property of properties">
+        <app-field-editor
+          [userId]="userId"
+          [property]="property"
+          [isActive]="true"
+          (validChange)="onValidChange($event.property.key, $event.valid)"
+        ></app-field-editor>
+      </ng-container>
+
+      <div class="form-control-group"></div>
+      <button nbButton type="submit">Update Me</button>
+    </form>
+    <div *ngIf="lastError" class="error-message">
+      {{ lastError }}
+    </div>
+    <div *ngIf="!lastError && saved">
+      <p>Success.</p>
+      <p><a [routerLink]="['/']">Return to home</a></p>
+    </div>
+  </nb-card-body>
+</nb-card>

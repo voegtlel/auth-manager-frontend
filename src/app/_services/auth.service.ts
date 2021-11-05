@@ -1,19 +1,20 @@
-import { Observable, BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { EnvService } from './env.service';
-import {
-  OAuthService,
-  OAuthErrorEvent,
-  OAuthSuccessEvent,
-} from 'angular-oauth2-oidc';
-import { filter, map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
+import {
+  OAuthErrorEvent,
+  OAuthService,
+  OAuthSuccessEvent,
+  ValidationParams,
+} from 'angular-oauth2-oidc';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+import { EnvService } from './env.service';
 
 export interface User {
   sub: string;
   given_name: string;
-  familty_name: string;
+  family_name: string;
   roles: string[];
   [key: string]: any;
 }
@@ -23,18 +24,16 @@ export interface User {
 })
 export class AuthService {
   private readonly _loggedIn$ = new BehaviorSubject<boolean>(null);
-  public readonly loggedIn$: Observable<
-    boolean
-  > = this._loggedIn$.asObservable();
+  public readonly loggedIn$: Observable<boolean> =
+    this._loggedIn$.asObservable();
   private readonly _user$ = new BehaviorSubject<User>(null);
   public readonly user$: Observable<User> = this._user$.asObservable();
   public readonly isAdmin$: Observable<boolean> = this.user$.pipe(
     map((user) => user && user.roles.includes('admin'))
   );
   private readonly _lastError$ = new BehaviorSubject<string>(null);
-  public readonly lastError$: Observable<
-    string
-  > = this._lastError$.asObservable();
+  public readonly lastError$: Observable<string> =
+    this._lastError$.asObservable();
 
   private readonly _discoveryDocument$ = new BehaviorSubject<
     Record<string, any>
@@ -211,5 +210,62 @@ export class AuthService {
         b64.charAt(bits & 63);
     }
     return result;
+  }
+
+  protected padBase64(base64data: string): string {
+    while (base64data.length % 4 !== 0) {
+      base64data += '=';
+    }
+    return base64data;
+  }
+
+  protected b64DecodeUnicode(str: string): string {
+    return decodeURIComponent(
+      atob(str.replace(/\-/g, '+').replace(/\_/g, '/'))
+        .split('')
+        .map((c) => {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
+  }
+
+  async validateUpdateToken(updateToken: string): Promise<Record<string, any>> {
+    const tokenParts = updateToken.split('.');
+    const headerBase64 = this.padBase64(tokenParts[0]);
+    const headerJson = this.b64DecodeUnicode(headerBase64);
+    const header = JSON.parse(headerJson);
+    const claimsBase64 = this.padBase64(tokenParts[1]);
+    const claimsJson = this.b64DecodeUnicode(claimsBase64);
+    const claims = JSON.parse(claimsJson);
+
+    const now = Date.now();
+    const issuedAtMSec = claims.iat * 1000;
+    const expiresAtMSec = claims.exp * 1000;
+    const clockSkewInMSec = 600 * 1000;
+
+    if (
+      issuedAtMSec - clockSkewInMSec >= now ||
+      expiresAtMSec + clockSkewInMSec <= now
+    ) {
+      const err = 'Token has expired';
+      console.error(err);
+      throw new Error(err);
+    }
+
+    const validationParams: ValidationParams = {
+      idToken: updateToken,
+      idTokenHeader: header,
+      jwks: this.oauthService.jwks,
+      accessToken: null,
+      idTokenClaims: null,
+      loadKeys: null,
+    };
+
+    await this.oauthService.tokenValidationHandler.validateSignature(
+      validationParams
+    );
+
+    return claims;
   }
 }
