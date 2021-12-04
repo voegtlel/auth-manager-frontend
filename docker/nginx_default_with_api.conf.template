@@ -66,4 +66,8 @@ server {
     location /mail {
         proxy_pass http://api/mail;
     }
+
+    location /card {
+        proxy_pass http://api/card;
+    }
 }
