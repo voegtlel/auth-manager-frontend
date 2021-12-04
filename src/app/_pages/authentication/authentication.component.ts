@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { OAuthService } from 'angular-oauth2-oidc';
+import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { AuthService } from 'src/app/_services/auth.service';
-import { Observable } from 'rxjs';
 
 @Component({
   templateUrl: './authentication.component.html',
@@ -12,13 +12,18 @@ export class AuthenticationComponent {
   loggedIn$: Observable<boolean>;
   name$: Observable<string>;
   lastError$: Observable<string>;
+  returnUrl?: string = undefined;
 
-  constructor(private auth: AuthService) {
+  constructor(private auth: AuthService, route: ActivatedRoute) {
     this.loggedIn$ = auth.loggedIn$;
     this.lastError$ = auth.lastError$;
     this.name$ = auth.user$
       .pipe(filter((user) => !!user))
       .pipe(map((user) => user.given_name));
+
+    route.queryParams
+      .pipe(map((params) => params.returnUrl))
+      .subscribe((returnUrl) => (this.returnUrl = returnUrl));
   }
 
   logout() {
@@ -26,6 +31,6 @@ export class AuthenticationComponent {
   }
 
   login() {
-    this.auth.login();
+    this.auth.login(this.returnUrl);
   }
 }

@@ -120,6 +120,11 @@ export class AuthService {
           router.navigate(['/']);
         }
         this._loggedIn$.next(loggedIn);
+        if (loggedIn) {
+          if (this.oauthService.state) {
+            router.navigate([decodeURIComponent(this.oauthService.state)]);
+          }
+        }
       });
 
     this.oauthService.events
@@ -170,8 +175,8 @@ export class AuthService {
     }
   }
 
-  login() {
-    this.oauthService.initLoginFlow();
+  login(returnUrl?: string) {
+    this.oauthService.initLoginFlow(returnUrl);
   }
 
   isSelf(userId: string): boolean {

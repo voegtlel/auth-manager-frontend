@@ -98,6 +98,7 @@ const routes: Routes = [
     component: ProfileComponent,
   },
   {
+    canActivate: [AuthGuard],
     path: 'profile/update/:token',
     component: UpdateUserTokenComponent,
   },
