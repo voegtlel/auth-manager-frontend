@@ -46,3 +46,7 @@ export interface PasswordReset {
 export interface PasswordInWrite {
   password: string;
 }
+
+export interface PasswordResetResult {
+  reset_link: string | null;
+}

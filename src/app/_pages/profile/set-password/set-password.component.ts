@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { AuthService } from 'src/app/_services/auth.service';
 import { ApiService } from 'src/app/_services/api.service';
 import { NbToastrService } from '@nebular/theme';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-set-password',
@@ -52,7 +53,8 @@ export class SetPasswordComponent {
   constructor(
     public apiService: ApiService,
     public authService: AuthService,
-    private toastr: NbToastrService
+    private toastr: NbToastrService,
+    private clipboard: Clipboard
   ) {}
 
   submitPassword($event) {
@@ -108,6 +110,48 @@ export class SetPasswordComponent {
             'Sent password reset link to user.',
             'Password Reset'
           );
+        },
+        (err) => {
+          this.saving = false;
+          if (err?.status === 0) {
+            this.toastr.danger(err?.statusText, 'Error');
+            this.lastError = err?.statusText;
+          } else if (err?.error?.detail) {
+            this.toastr.danger(err?.error?.detail, 'Error');
+            this.lastError = err?.error?.detail.toString();
+          } else if (err?.error) {
+            this.toastr.danger(err?.error, 'Error');
+            this.lastError = err?.error.toString();
+          }
+          console.log(err);
+        }
+      );
+  }
+
+  copyPasswordLink() {
+    this.saving = true;
+    this.apiService
+      .requestResetUserPassword(this.userId, true)
+      .toPromise()
+      .then(
+        (passwordLinkResult) => {
+          this.saving = false;
+          if (this.clipboard.copy(passwordLinkResult.reset_link)) {
+            this.toastr.success(
+              'Copied password reset link to clipboard.',
+              'Password Reset'
+            );
+          } else {
+            this.toastr.warning(
+              'Could not copy password reset link to clipboard. Next block contains the reset link, copy manually!',
+              'Password Reset'
+            );
+            this.toastr.show(passwordLinkResult.reset_link, 'Password Reset', {
+              destroyByClick: false,
+              duration: 60000,
+              status: 'warning',
+            });
+          }
         },
         (err) => {
           this.saving = false;

@@ -2,7 +2,11 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { UserViewData, UsersListViewData } from '../_models/user';
+import {
+  PasswordResetResult,
+  UserViewData,
+  UsersListViewData,
+} from '../_models/user';
 import { EnvService } from './env.service';
 import { GroupInList } from '../_models/group';
 import { Client, ClientInList } from '../_models/client';
@@ -104,9 +108,14 @@ export class ApiService {
     });
   }
 
-  requestResetUserPassword(userId: string): Observable<void> {
-    return this.http.post<void>(
-      `${this.env.apiUrl}/users/${userId}/reset-password`,
+  requestResetUserPassword(
+    userId: string,
+    returnLink: boolean = false
+  ): Observable<PasswordResetResult> {
+    return this.http.post<PasswordResetResult>(
+      `${this.env.apiUrl}/users/${userId}/reset-password${
+        returnLink ? '?return_link=true' : ''
+      }`,
       null
     );
   }
