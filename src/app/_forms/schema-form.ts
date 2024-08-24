@@ -56,6 +56,7 @@ export class SchemaUserPropertyFormGroup extends TypedFormGroup<
     values: EnumValueFormArray;
     template: TypedFormControl<string>;
     required: TypedFormControl<boolean>;
+    new_required: TypedFormControl<boolean>;
 
     protected: TypedFormControl<boolean>;
   }
@@ -76,6 +77,7 @@ export class SchemaUserPropertyFormGroup extends TypedFormGroup<
       values: new EnumValueFormArray(value?.values),
       template: new TypedFormControl(value?.template),
       required: new TypedFormControl(value?.required),
+      new_required: new TypedFormControl(value?.new_required),
 
       protected: new TypedFormControl(value?.protected ?? false),
     });
@@ -110,6 +112,9 @@ export class SchemaUserPropertyFormGroup extends TypedFormGroup<
     }
     if (!result.required) {
       delete result.required;
+    }
+    if (!result.new_required) {
+      delete result.new_required;
     }
     if (!result.write_once) {
       delete result.write_once;

@@ -110,8 +110,10 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
     const wasValid = this.formatMatch && this.requiredMatch;
     if (value == null) {
       if (
-        this.property.required &&
-        (this.isActive || (this.isNew && this.property.can_edit === 'admin'))
+        (this.property.required &&
+          (this.isActive ||
+            (this.isNew && this.property.can_edit === 'admin'))) ||
+        (this.property.new_required && this.isNew)
       ) {
         this.requiredMatch = false;
       }
@@ -177,8 +179,10 @@ export class FieldEditorComponent implements OnInit, OnDestroy, OnChanges {
     }
     // If required and active, or if required and only the admin can edit, then this must be set
     if (
-      this.property.required &&
-      (this.isActive || (this.isNew && this.property.can_edit === 'admin'))
+      (this.property.required &&
+        (this.isActive ||
+          (this.isNew && this.property.can_edit === 'admin'))) ||
+      (this.property.new_required && this.isNew)
     ) {
       this.requiredMatch = !!this.property.value;
     }

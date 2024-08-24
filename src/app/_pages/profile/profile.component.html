@@ -17,7 +17,7 @@
                 *ngIf="
                   (property.visible === 'everybody' ||
                     (property.visible === 'self' && (isSelf || isAdmin)) ||
-                    (property.visible === 'admin' && isAdmin)) &&
+                    (property.visible === 'admin' && isAdmin && !isNew)) &&
                   (!property.template || (!isNew && !registrationToken))
                 "
                 [userId]="profileData.user_id"

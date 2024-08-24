@@ -3,6 +3,7 @@ import { UserPropertyWithValue, UserViewDataGroup } from 'src/app/_models/user';
 import { ApiService } from 'src/app/_services/api.service';
 import { NbToastrService } from '@nebular/theme';
 import { AuthService } from 'src/app/_services/auth.service';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-set-email',
@@ -41,19 +42,18 @@ export class SetEmailComponent implements OnChanges {
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    private toastr: NbToastrService
+    private toastr: NbToastrService,
+    private clipboard: Clipboard
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.propertyGroup) {
       if (this.propertyGroup) {
-        const propsByKey: Record<
-          string,
-          UserPropertyWithValue
-        > = this.propertyGroup.properties.reduce((o, prop) => {
-          o[prop.key] = prop;
-          return o;
-        }, {});
+        const propsByKey: Record<string, UserPropertyWithValue> =
+          this.propertyGroup.properties.reduce((o, prop) => {
+            o[prop.key] = prop;
+            return o;
+          }, {});
         this.emailProperty = propsByKey.email;
         this.emailVerifiedProperty = propsByKey.email_verified;
         this.emailForwardProperty = propsByKey.forward_emails;
@@ -79,7 +79,7 @@ export class SetEmailComponent implements OnChanges {
         .updateUser(this.userId, this.updateValue)
         .toPromise()
         .then(
-          () => {
+          (updateResult) => {
             if (this.updateValue[this.emailProperty.key]) {
               if (this.isSelf) {
                 this.toastr.success(
@@ -91,6 +91,24 @@ export class SetEmailComponent implements OnChanges {
             }
             this.updateValue = {};
             this.saving = false;
+            if (updateResult.link) {
+              if (this.clipboard.copy(updateResult.link)) {
+                this.toastr.success(
+                  'Sent e-mail activation link to user and copied link to clipboard.',
+                  'E-Mail Activation'
+                );
+              } else {
+                this.toastr.warning(
+                  'Sent e-mail activation link to user, but could not copy link to clipboard. Next block contains the link, copy manually!',
+                  'E-Mail Activation'
+                );
+                this.toastr.show(updateResult.link, 'E-Mail Activation', {
+                  destroyByClick: false,
+                  duration: 60000,
+                  status: 'warning',
+                });
+              }
+            }
           },
           (err) => {
             this.saving = false;
@@ -115,7 +133,7 @@ export class SetEmailComponent implements OnChanges {
       .reverifyEmail(this.userId)
       .toPromise()
       .then(
-        () => {
+        (updateResult) => {
           this.saving = false;
           if (this.isSelf) {
             this.toastr.success(
@@ -129,6 +147,24 @@ export class SetEmailComponent implements OnChanges {
               'E-Mail Verification',
               { duration: 5000 }
             );
+          }
+          if (updateResult.link) {
+            if (this.clipboard.copy(updateResult.link)) {
+              this.toastr.success(
+                'Sent e-mail activation link to user and copied link to clipboard.',
+                'E-Mail Activation'
+              );
+            } else {
+              this.toastr.warning(
+                'Sent e-mail activation link to user, but could not copy link to clipboard. Next block contains the link, copy manually!',
+                'E-Mail Activation'
+              );
+              this.toastr.show(updateResult.link, 'E-Mail Activation', {
+                destroyByClick: false,
+                duration: 60000,
+                status: 'warning',
+              });
+            }
           }
         },
         (err) => {
@@ -153,13 +189,31 @@ export class SetEmailComponent implements OnChanges {
       .resendRegistration(this.userId)
       .toPromise()
       .then(
-        () => {
+        (updateResult) => {
           this.saving = false;
           this.toastr.success(
             'Sent registration form to user for (re-)registration.',
             '(Re-)Registration',
             { duration: 5000 }
           );
+          if (updateResult.link) {
+            if (this.clipboard.copy(updateResult.link)) {
+              this.toastr.success(
+                'Sent e-mail activation link to user and copied link to clipboard.',
+                'E-Mail Activation'
+              );
+            } else {
+              this.toastr.warning(
+                'Sent e-mail activation link to user, but could not copy link to clipboard. Next block contains the link, copy manually!',
+                'E-Mail Activation'
+              );
+              this.toastr.show(updateResult.link, 'E-Mail Activation', {
+                destroyByClick: false,
+                duration: 60000,
+                status: 'warning',
+              });
+            }
+          }
         },
         (err) => {
           this.saving = false;

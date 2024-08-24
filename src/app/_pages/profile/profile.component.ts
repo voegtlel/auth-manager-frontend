@@ -13,6 +13,7 @@ import { UserPropertyWithValue, UserViewData } from 'src/app/_models/user';
 import { ApiService } from 'src/app/_services/api.service';
 import { AuthService } from 'src/app/_services/auth.service';
 import { UsersService } from 'src/app/_services/users.service';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   templateUrl: './profile.component.html',
@@ -44,7 +45,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private toastr: NbToastrService,
     private dialogService: NbDialogService,
     private usersService: UsersService,
-    private changeDetector: ChangeDetectorRef
+    private changeDetector: ChangeDetectorRef,
+    private clipboard: Clipboard
   ) {}
 
   ngOnDestroy() {
@@ -183,10 +185,28 @@ export class ProfileComponent implements OnInit, OnDestroy {
           .createUser(this.updateValues, !this.sendRegistrationLink)
           .toPromise()
           .then(
-            () => {
+            (updateResult) => {
               this.saving = false;
               this.updateValues = {};
               this.usersService.invalidate();
+              if (updateResult.link) {
+                if (this.clipboard.copy(updateResult.link)) {
+                  this.toastr.success(
+                    'E-Mail with link was sent to user and also copied to clipboard.',
+                    'E-Mail and Clipboard'
+                  );
+                } else {
+                  this.toastr.warning(
+                    'E-Mail was sent to user, but could not copy link to clipboard. Next block contains the link, copy manually!',
+                    'E-Mail and Clipboard'
+                  );
+                  this.toastr.show(updateResult.link, 'Password Reset', {
+                    destroyByClick: false,
+                    duration: 60000,
+                    status: 'warning',
+                  });
+                }
+              }
               if (this.returnUrl) {
                 window.location.href = this.returnUrl;
               } else {
@@ -212,9 +232,27 @@ export class ProfileComponent implements OnInit, OnDestroy {
           .updateUser(this.userId, this.updateValues)
           .toPromise()
           .then(
-            () => {
+            (updateResult) => {
               this.saving = false;
               this.updateValues = {};
+              if (updateResult.link) {
+                if (this.clipboard.copy(updateResult.link)) {
+                  this.toastr.success(
+                    'E-Mail with link was sent to user and also copied to clipboard.',
+                    'E-Mail and Clipboard'
+                  );
+                } else {
+                  this.toastr.warning(
+                    'E-Mail was sent to user, but could not copy link to clipboard. Next block contains the link, copy manually!',
+                    'E-Mail and Clipboard'
+                  );
+                  this.toastr.show(updateResult.link, 'Password Reset', {
+                    destroyByClick: false,
+                    duration: 60000,
+                    status: 'warning',
+                  });
+                }
+              }
               if (this.returnUrl) {
                 window.location.href = this.returnUrl;
               }

@@ -477,6 +477,28 @@
         <nb-checkbox
           fullWidth
           fieldSize="medium"
+          [formControl]="user_property.controls.new_required"
+          [status]="
+            user_property.controls.new_required.valid ? 'basic' : 'danger'
+          "
+          >Required when creating new user
+          <nb-icon
+            icon="question-mark-circle-outline"
+            nbTooltip="Makes the property required when creating a new user, i.e. it must be set before saving."
+          ></nb-icon
+        ></nb-checkbox>
+        <div
+          *ngIf="user_property.controls.new_required.hasError('required')"
+          class="error-message"
+        >
+          Required.
+        </div>
+      </div>
+
+      <div class="form-control-group">
+        <nb-checkbox
+          fullWidth
+          fieldSize="medium"
           [formControl]="user_property.controls.protected"
           [status]="user_property.controls.protected.valid ? 'basic' : 'danger'"
           >Protected

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import {
-  PasswordResetResult,
+  UserUpdateResult,
   UserViewData,
   UsersListViewData,
 } from '../_models/user';
@@ -50,16 +50,25 @@ export class ApiService {
     return this.http.get<UserViewData>(`${this.env.apiUrl}/users/new`);
   }
 
-  createUser(updates: object, noRegistration?: boolean): Observable<void> {
+  createUser(
+    updates: object,
+    noRegistration?: boolean
+  ): Observable<UserUpdateResult> {
     let query = '';
     if (noRegistration) {
       query = '?no_registration=true';
     }
-    return this.http.post<void>(`${this.env.apiUrl}/users${query}`, updates);
+    return this.http.post<UserUpdateResult>(
+      `${this.env.apiUrl}/users${query}`,
+      updates
+    );
   }
 
-  updateUser(userId: string, updates: object): Observable<void> {
-    return this.http.patch<void>(`${this.env.apiUrl}/users/${userId}`, updates);
+  updateUser(userId: string, updates: object): Observable<UserUpdateResult> {
+    return this.http.patch<UserUpdateResult>(
+      `${this.env.apiUrl}/users/${userId}`,
+      updates
+    );
   }
 
   getUser(userId: string): Observable<UserViewData> {
@@ -70,15 +79,15 @@ export class ApiService {
     return this.http.delete<void>(`${this.env.apiUrl}/users/${userId}`);
   }
 
-  reverifyEmail(userId: string): Observable<void> {
-    return this.http.post<void>(
+  reverifyEmail(userId: string): Observable<UserUpdateResult> {
+    return this.http.post<UserUpdateResult>(
       `${this.env.apiUrl}/users/${userId}/reverify-email`,
       null
     );
   }
 
-  resendRegistration(userId: string): Observable<void> {
-    return this.http.post<void>(
+  resendRegistration(userId: string): Observable<UserUpdateResult> {
+    return this.http.post<UserUpdateResult>(
       `${this.env.apiUrl}/users/${userId}/resend-registration`,
       null
     );
@@ -108,14 +117,9 @@ export class ApiService {
     });
   }
 
-  requestResetUserPassword(
-    userId: string,
-    returnLink: boolean = false
-  ): Observable<PasswordResetResult> {
-    return this.http.post<PasswordResetResult>(
-      `${this.env.apiUrl}/users/${userId}/reset-password${
-        returnLink ? '?return_link=true' : ''
-      }`,
+  requestResetUserPassword(userId: string): Observable<UserUpdateResult> {
+    return this.http.post<UserUpdateResult>(
+      `${this.env.apiUrl}/users/${userId}/reset-password`,
       null
     );
   }

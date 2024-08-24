@@ -41,6 +41,7 @@ export interface UserProperty {
   values?: EnumValue[];
   template?: string;
   required?: boolean;
+  new_required?: boolean;
 
   protected?: boolean;
 }
